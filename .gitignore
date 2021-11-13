@@ -76,6 +76,10 @@ typings/
 # Output of 'npm pack'
 *.tgz
 
+res.json
+package-lock.json
+yarn.lock
+
 # Yarn Integrity file
 .yarn-integrity
 
