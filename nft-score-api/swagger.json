@@ -1,0 +1,10 @@
+{
+  openapi: '3.0.3',
+  info: { title: 'OpenSea Orderbook' },
+  servers: [ { url: 'https://api.opensea.io/wyvern/v1' } ],
+  components: { securitySchemes: { sec0: [Object] } },
+  security: [ { sec0: [] } ],
+  paths: { '/orders': { get: [Object] } },
+  'x-readme': { headers: [] },
+  'x-readme-fauxas': true
+}
