@@ -2,6 +2,8 @@ import * as Web3 from 'web3'
 import { OpenSeaPort, Network } from 'opensea-js'
 import { Asset,OrderSide,Order, OpenSeaFungibleToken } from "opensea-js/lib/types"
 import BigNumber from 'bignumber.js';
+import * as OpenseaAPI from "./opensea_api";
+var jp = require('jsonpath');
 const DEC_PRECISION = 4;
 
 var jp = require('jsonpath');
@@ -71,3 +73,36 @@ export async function getNFTValue(contractAdr: string, tokenID: string): Promise
     console.log(`average buy price  is ${avgBuy} average sell price is ${avgSell}`);
     return avgBuy;
 };
+
+export async function getExpertScore(expertAddress: string): Promise<any> {
+
+  let data = await OpenseaAPI.openseaApiGet("events",{account_address: expertAddress});
+  if (data===false)
+  { return false;}
+  return calcExpertScoreFromEvents(data);
+  
+}
+
+function calcExpertScoreFromEvents(data: Object): number
+{
+  let sales = jp.query(data,'$.asset_events[?(@.event_type=="successful")]');
+  let canceledAuctions = jp.query(data,'$.asset_events[?(@.event_type=="cancelled")]');
+  let bids = jp.query(data,'$.asset_events[?(@.event_type=="bid_entered")]');
+  let bidWithrawls = jp.query(data,'$.asset_events[?(@.event_type=="bid_withdrawn")]');
+  let transfers = jp.query(data,'$.asset_events[?(@.event_type=="transfer")]');
+  let offers = jp.query(data,'$.asset_events[?(@.event_type=="offer_entered")]');
+  let approvals = jp.query(data,'$.asset_events[?(@.event_type=="approve")]');
+
+  //console.log(` sales: ${sales.length} canceledAuctions: ${canceledAuctions.length} bids: ${bids.length} bidWithrawls: ${bidWithrawls.length} transfers: ${transfers.length} offers: ${offers.length} approvals: ${approvals.length} `);
+
+  console.log(`1: ${sigmoid(1)}, 0: ${sigmoid(0)}, 10: ${sigmoid(10)}, 100: ${sigmoid(100)}, 20: ${sigmoid(20)}, 5: ${sigmoid(5)}, `);
+  //console.log(` sales: ${JSON.stringify(sales)} `);
+  let score = Math.round(sigmoid(5*sales.length+bids.length+transfers.length+offers.length+approvals.length)*10000);
+  console.log(`score: ${score}`);
+  return score;
+}
+
+const k = 20;
+function sigmoid(z: number) {
+  return ((1 / (1 + Math.exp(-z/k)))-0.5)*2;
+}
