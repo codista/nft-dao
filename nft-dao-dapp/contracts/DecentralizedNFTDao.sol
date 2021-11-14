@@ -17,7 +17,7 @@ contract DecentralizedNFTDao is ChainlinkClient, ConfirmedOwner {
     uint256 constant private ORACLE_PAYMENT = 1 * LINK_DIVISIBILITY;
     uint256 constant public MIN_EVAL_PAYMENT = 1*(10**15);
 
-    enum ExpertEvaluationStatus{ Pending, Resolved, Failed, None }
+    enum ExpertEvaluationStatus{ None,Pending, Resolved, Failed}
 
     enum NFTAppraisalStatus{ Open, Resolved, Failed }
 
@@ -51,6 +51,8 @@ contract DecentralizedNFTDao is ChainlinkClient, ConfirmedOwner {
     mapping(uint256 => mapping(address=>bool)) public appraisal_voters;
 
     mapping(uint256 => Vote[]) public appraisal_votes;
+
+    mapping(bytes32 => address) public req_id_to_exp;
     
     NFTApprisalRequest[] appraisals;
     
@@ -88,13 +90,24 @@ contract DecentralizedNFTDao is ChainlinkClient, ConfirmedOwner {
         user_appraisals[msg.sender].push(appraisals.length - 1);
     }
 
+    function getExpertStatus(address expert) public view returns (ExpertEvaluationStatus)
+    {
+        return (experts[expert].initialized)?experts[expert].status: ExpertEvaluationStatus.None;
+    }
+
+    function getExpertSCore(address expert) public view returns (uint256)
+    {
+        return (experts[expert].initialized)?experts[expert].score: 0;
+    }
     
-    function fulfillExpertiseScore(bytes32 _requestId, uint256 score, address expert)
+    function fulfillExpertiseScore(bytes32 _requestId, uint256 score)
      public
         recordChainlinkFulfillment(_requestId)
     {
-        //emit RequestNFTValueFulfilled(_requestId, _nftvalue);
-        experts[expert].score = score;
+        //emit RequestExpertiseScoreFulfilled(_requestId, _nftvalue);
+        
+        experts[req_id_to_exp[_requestId]].score = score;
+        experts[req_id_to_exp[_requestId]].status = ExpertEvaluationStatus.Resolved;
     }
 
     function getUserAppraisalRequests() public view returns(NFTApprisalRequest[] memory)
@@ -163,9 +176,9 @@ contract DecentralizedNFTDao is ChainlinkClient, ConfirmedOwner {
     //join Dao
     function JoinDao() public {
         require(experts[msg.sender].initialized==false,"Expert is already a member");
-        //temporary implementation
-        experts[msg.sender]=Expert(80000,ExpertEvaluationStatus.Resolved,true);
-
+        experts[msg.sender]=Expert(0,ExpertEvaluationStatus.Pending,true);
+        bytes32 reqId = requestExpertiseScore(msg.sender);
+        req_id_to_exp[reqId]=msg.sender;
     }
 
     function getAppraisalVotes(uint256 appraisal_id) public view onlyAppraisalCreator(appraisal_id) returns (Vote[] memory) {
@@ -197,13 +210,13 @@ contract DecentralizedNFTDao is ChainlinkClient, ConfirmedOwner {
     }
 
     function requestExpertiseScore(address expert)
-        public
-        onlyOwner
+        internal returns (bytes32)
+        
     {
         Chainlink.Request memory req = buildChainlinkRequest(stringToBytes32(_oracleJobId), address(this), this.fulfillExpertiseScore.selector);
         req.add("expertAddress", _addressToString(expert));
-        
-        sendChainlinkRequestTo(_oracle, req, ORACLE_PAYMENT);
+        return sendChainlinkRequestTo(_oracle, req, ORACLE_PAYMENT);
+        //return "fff";
     }
     
     //function _calculateNFTAppraisal()
@@ -223,10 +236,7 @@ contract DecentralizedNFTDao is ChainlinkClient, ConfirmedOwner {
         }
     }
 
-    modifier onlyExpert {
-      require(experts[msg.sender].initialized == true && experts[msg.sender].status == ExpertEvaluationStatus.Resolved,"only approved experts can call this function");
-      _;
-   }
+    
 
    modifier onlyAppraisalCreator(uint256 appraisal_id) {
        bool isCreator=false;
@@ -237,6 +247,11 @@ contract DecentralizedNFTDao is ChainlinkClient, ConfirmedOwner {
            }
        }
       require(isCreator == true,"only the creator of an appraisal can call this function");
+      _;
+   }
+
+   modifier onlyExpert() {
+      require(experts[msg.sender].initialized == true && experts[msg.sender].status==ExpertEvaluationStatus.Resolved,"Only approved experts can call this function");
       _;
    }
 

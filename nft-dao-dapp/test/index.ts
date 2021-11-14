@@ -3,6 +3,7 @@ import { ethers,artifacts } from "hardhat";
 import type Contract from "ethers";
 import * as dotenv from "dotenv";
 import  { DecentralizedNFTDao } from "../typechain";
+import {LINK_ADDR_RINKEBY,LINK_ABI} from "./conf"
 //import { SSL_OP_EPHEMERAL_RSA } from "constants";
 //import fs from "fs";
 //import path  from "path";
@@ -36,7 +37,15 @@ describe("DecentralizedNFTDao Contract", function () {
     await NFTDaoCont.deployed();
     console.log(`nftdao contract deployed at ${NFTDaoCont.address}`)
     gasPrice = await provider.getGasPrice();
+    let LINKCont = new ethers.Contract(LINK_ADDR_RINKEBY,LINK_ABI, signer);
     
+    //tansfer link to the newly deployed contract
+    let receipt = await LINKCont.transfer(NFTDaoCont.address,Math.pow(10,18).toString(),{gasLimit:350000,gasPrice:gasPrice.toNumber()});
+    let ret = await receipt.wait(1);
+
+    let balance = await LINKCont.balanceOf(NFTDaoCont.address);
+    console.log(`contract has ${balance} LINK`);
+
     //console.log(`gas price 1 ${gasPrice}`);
   });
 
@@ -74,19 +83,47 @@ describe("DecentralizedNFTDao Contract", function () {
     expect(appraisals.length).to.equal(0); 
   });
 
-  it("Should return open appraisals matching an experts score", async function () {
+  it("Should successfully receive expertise score from chainlink when expert joins dao", async function () {
     //connect and join dao as expert
     let NFTDaoContExpert = NFTDaoCont.connect(expertSigner);
-    let receipt = await NFTDaoContExpert.JoinDao({gasLimit:350000,gasPrice:gasPrice.toNumber()});
-    let ret = await receipt.wait(1);
+    try {
+      let receipt = await NFTDaoContExpert.JoinDao({gasLimit:350000,gasPrice:gasPrice.toNumber()});
+      let ret = await receipt.wait(1);
+    }
+    catch(error: any) {
+      console.error("failed to join dao "+error.message);
+    }
+    console.log('joined dao');
+    let status=-1;
+    try {
+      status = await NFTDaoContExpert.getExpertStatus(expertSigner.address);
+    }
+    catch(error: any){
+      console.error("failed to get status "+error.message);
+    }
+    console.log("initial status is "+status);
+    let counter=0;
+    while (status!=2 && counter<4) {
+      status = await NFTDaoContExpert.getExpertStatus(expertSigner.address);
+      console.log("status is "+status);
+      counter++;
+    }
+    let score = await NFTDaoContExpert.getExpertSCore(expertSigner.address);
+    console.log(`expert score is ${score}`);
+    
+  });
+
+  it("Should return open appraisals matching an experts score", async function () {
+    let NFTDaoContExpert = NFTDaoCont.connect(expertSigner);
+    
     //add 4 total appraisal requests with only 2 being a match for this expert (score:8.0000)
-    receipt = await NFTDaoCont.SubmitNFTForAppraisal(nft_contract,
-                          nft_id,
-                          nft_url,
+    let receipt = await NFTDaoCont.SubmitNFTForAppraisal(nft_contract,
+                        nft_id,
+                        nft_url,
                         3,
                         70000,
                         {gasLimit:350000,gasPrice:gasPrice.toNumber(),value:2000000000000000});  
-    ret = await receipt.wait(1);
+    let ret = await receipt.wait(1);
 
     receipt = await NFTDaoCont.SubmitNFTForAppraisal(nft_contract,
       nft_id,
