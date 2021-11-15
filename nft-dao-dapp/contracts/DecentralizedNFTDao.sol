@@ -12,6 +12,7 @@ contract DecentralizedNFTDao is ChainlinkClient, ConfirmedOwner {
     constructor(address oracle, string memory jobid) ConfirmedOwner(msg.sender) {
         _oracle = oracle;
         _oracleJobId = jobid;
+        setPublicChainlinkToken();
     }
 
     uint256 constant private ORACLE_PAYMENT = 1 * LINK_DIVISIBILITY;
@@ -200,21 +201,23 @@ contract DecentralizedNFTDao is ChainlinkClient, ConfirmedOwner {
 
     }
 
+    
+
     function _handleVotePayout(NFTApprisalRequest memory appr) internal {
         //TO DO: dittribute payout between voters 
     }
 
-    function _addressToString(address addr) internal pure returns (string memory)
-    {
-        return string(abi.encodePacked(addr));
-    }
+    //function _addressToString(address addr) internal pure returns (string memory)
+    //{
+    //    return string(abi.encodePacked(addr));
+    //}
 
     function requestExpertiseScore(address expert)
         internal returns (bytes32)
         
     {
         Chainlink.Request memory req = buildChainlinkRequest(stringToBytes32(_oracleJobId), address(this), this.fulfillExpertiseScore.selector);
-        req.add("expertAddress", _addressToString(expert));
+        req.add("expertAddress", toAsciiString(expert));
         return sendChainlinkRequestTo(_oracle, req, ORACLE_PAYMENT);
         //return "fff";
     }
@@ -254,6 +257,25 @@ contract DecentralizedNFTDao is ChainlinkClient, ConfirmedOwner {
       require(experts[msg.sender].initialized == true && experts[msg.sender].status==ExpertEvaluationStatus.Resolved,"Only approved experts can call this function");
       _;
    }
+
+    function toAsciiString(address x) public returns (string memory) {
+        bytes memory s = new bytes(40);
+        for (uint i = 0; i < 20; i++) {
+            bytes1 b = bytes1(uint8(uint(uint160(x)) / (2**(8*(19 - i)))));
+            bytes1 hi = bytes1(uint8(b) / 16);
+            bytes1 lo = bytes1(uint8(b) - 16 * uint8(hi));
+            s[2*i] = char(hi);
+            s[2*i+1] = char(lo);            
+        }
+        return string(abi.encodePacked("0x",s));
+    }
+
+
+    function char(bytes1 b) public returns (bytes1 c) {
+
+        if (uint8(b) < 10) return bytes1(uint8(b) + 0x30);
+        else return bytes1(uint8(b) + 0x57);
+    }
 
    
 

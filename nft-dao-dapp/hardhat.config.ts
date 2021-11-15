@@ -24,7 +24,7 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 
 const config: HardhatUserConfig = {
   mocha: {
-    timeout: 80000
+    timeout: 160000
   },
   solidity: {
     compilers: [

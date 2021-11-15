@@ -93,12 +93,16 @@ function calcExpertScoreFromEvents(data: Object): number
   let offers = jp.query(data,'$.asset_events[?(@.event_type=="offer_entered")]');
   let approvals = jp.query(data,'$.asset_events[?(@.event_type=="approve")]');
 
-  //console.log(` sales: ${sales.length} canceledAuctions: ${canceledAuctions.length} bids: ${bids.length} bidWithrawls: ${bidWithrawls.length} transfers: ${transfers.length} offers: ${offers.length} approvals: ${approvals.length} `);
+  console.log(` sales: ${sales.length} canceledAuctions: ${canceledAuctions.length} bids: ${bids.length} bidWithrawls: ${bidWithrawls.length} transfers: ${transfers.length} offers: ${offers.length} approvals: ${approvals.length} `);
 
-  console.log(`1: ${sigmoid(1)}, 0: ${sigmoid(0)}, 10: ${sigmoid(10)}, 100: ${sigmoid(100)}, 20: ${sigmoid(20)}, 5: ${sigmoid(5)}, `);
+  //console.log(`1: ${sigmoid(1)}, 0: ${sigmoid(0)}, 10: ${sigmoid(10)}, 100: ${sigmoid(100)}, 20: ${sigmoid(20)}, 5: ${sigmoid(5)}, `);
   //console.log(` sales: ${JSON.stringify(sales)} `);
   let score = Math.round(sigmoid(5*sales.length+bids.length+transfers.length+offers.length+approvals.length)*10000);
+
+  //score should never be zero to enable default solidity score (0) to represent uninitiated score
+  if (score==0) {score=1}
   console.log(`score: ${score}`);
+
   return score;
 }
 

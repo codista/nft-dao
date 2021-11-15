@@ -19,9 +19,10 @@ describe("DecentralizedNFTDao Contract", function () {
   let expertSigner = new ethers.Wallet( process.env.EXPERT_SIGNER as string,provider);
   let expertSigner2 = new ethers.Wallet( process.env.EXPERT_2 as string,provider);
   let expertSigner3 = new ethers.Wallet( process.env.EXPERT_3 as string,provider);
+  let expertWithHistory = new ethers.Wallet( process.env.EXPERT_WITH_HISTORY as string,provider);
   let user2 = new ethers.Wallet( process.env.User_2 as string,provider);
 
-  let nft_id=5628;
+  let nft_id="5628";
   let nft_contract="0x16baf0de678e52367adc69fd067e5edd1d33e3bf";
   let nft_url="https://testnets.opensea.io/assets/0x16baf0de678e52367adc69fd067e5edd1d33e3bf/5628";
 
@@ -40,7 +41,7 @@ describe("DecentralizedNFTDao Contract", function () {
     let LINKCont = new ethers.Contract(LINK_ADDR_RINKEBY,LINK_ABI, signer);
     
     //tansfer link to the newly deployed contract
-    let receipt = await LINKCont.transfer(NFTDaoCont.address,Math.pow(10,18).toString(),{gasLimit:350000,gasPrice:gasPrice.toNumber()});
+    let receipt = await LINKCont.transfer(NFTDaoCont.address,(Math.pow(10,18)).toString(),{gasLimit:350000,gasPrice:gasPrice.toNumber()});
     let ret = await receipt.wait(1);
 
     let balance = await LINKCont.balanceOf(NFTDaoCont.address);
@@ -61,7 +62,7 @@ describe("DecentralizedNFTDao Contract", function () {
                                                     nft_id,
                                                     nft_url,
                                                   3,
-                                                  85000,
+                                                  0,
                                                   {gasLimit:350000,gasPrice:gasPrice.toNumber(),value:2000000000000000});
     let ret = await res.wait(1);
     
@@ -85,43 +86,41 @@ describe("DecentralizedNFTDao Contract", function () {
 
   it("Should successfully receive expertise score from chainlink when expert joins dao", async function () {
     //connect and join dao as expert
-    let NFTDaoContExpert = NFTDaoCont.connect(expertSigner);
-    try {
-      let receipt = await NFTDaoContExpert.JoinDao({gasLimit:350000,gasPrice:gasPrice.toNumber()});
-      let ret = await receipt.wait(1);
-    }
-    catch(error: any) {
-      console.error("failed to join dao "+error.message);
-    }
+    let NFTDContExpWithHis = NFTDaoCont.connect(expertWithHistory);
+    
+    let receipt = await NFTDContExpWithHis.JoinDao({gasLimit:350000,gasPrice:gasPrice.toNumber()});
+    let ret = await receipt.wait(1);
+      //let receipt = await NFTDaoContExpert.requestCLValue(process.env.ORACLE_CONTRACT as string,process.env.TEST_JOB_ID as string,nft_contract,nft_id,{gasLimit:350000,gasPrice:gasPrice.toNumber()});
+      //let ret = await receipt.wait(1);
+    
     console.log('joined dao');
     let status=-1;
-    try {
-      status = await NFTDaoContExpert.getExpertStatus(expertSigner.address);
-    }
-    catch(error: any){
-      console.error("failed to get status "+error.message);
-    }
+    
+    status = await NFTDContExpWithHis.getExpertStatus(expertWithHistory.address);
     console.log("initial status is "+status);
     let counter=0;
-    while (status!=2 && counter<4) {
-      status = await NFTDaoContExpert.getExpertStatus(expertSigner.address);
+    while (status!=2 ) {
+      status = await NFTDContExpWithHis.getExpertStatus(expertWithHistory.address);
       console.log("status is "+status);
       counter++;
     }
-    let score = await NFTDaoContExpert.getExpertSCore(expertSigner.address);
+    let score = await NFTDContExpWithHis.getExpertSCore(expertWithHistory.address);
     console.log(`expert score is ${score}`);
     
   });
 
   it("Should return open appraisals matching an experts score", async function () {
-    let NFTDaoContExpert = NFTDaoCont.connect(expertSigner);
+    let NFTDContExpWithHis = NFTDaoCont.connect(expertWithHistory);
     
+    let score = await NFTDContExpWithHis.getExpertSCore(expertWithHistory.address);
+    console.log(`expert score is ${score}`);
+
     //add 4 total appraisal requests with only 2 being a match for this expert (score:8.0000)
     let receipt = await NFTDaoCont.SubmitNFTForAppraisal(nft_contract,
                         nft_id,
                         nft_url,
                         3,
-                        70000,
+                        0,
                         {gasLimit:350000,gasPrice:gasPrice.toNumber(),value:2000000000000000});  
     let ret = await receipt.wait(1);
 
@@ -129,7 +128,7 @@ describe("DecentralizedNFTDao Contract", function () {
       nft_id,
       nft_url,
       3,
-      72000,
+      score.toNumber()+1,
       {gasLimit:350000,gasPrice:gasPrice.toNumber(),value:2000000000000000});  
     ret = await receipt.wait(1);
     
@@ -137,35 +136,33 @@ describe("DecentralizedNFTDao Contract", function () {
       nft_id,
       nft_url,
       3,
-      90000,
+      score.toNumber()+1,
       {gasLimit:350000,gasPrice:gasPrice.toNumber(),value:2000000000000000});  
     ret = await receipt.wait(1);
     
 
     //get expert compatible appraisal requests
-    let appraisals = await NFTDaoContExpert.getAppraisalsForExpert({gasLimit:350000,gasPrice:gasPrice.toNumber()});
+    let appraisals = await NFTDContExpWithHis.getAppraisalsForExpert({gasLimit:350000,gasPrice:gasPrice.toNumber()});
     expect(appraisals.length).to.equal(2); 
   });
 
   it("Should enable an expert to vote on compatible open appraisal request", async function () {
     
     
-    let NFTDaoContExpert = NFTDaoCont.connect(expertSigner);
+    let NFTDContExpWithHis = NFTDaoCont.connect(expertWithHistory);
 
-    let NFTDaoContExpert2 = NFTDaoCont.connect(expertSigner2);
-    let receipt = await NFTDaoContExpert2.JoinDao({gasLimit:350000,gasPrice:gasPrice.toNumber()});
-    let ret = await receipt.wait(1);
+    //let NFTDaoContExpert2 = NFTDaoCont.connect(expertSigner2);
+    //let receipt = await NFTDaoContExpert2.JoinDao({gasLimit:350000,gasPrice:gasPrice.toNumber()});
+    //let ret = await receipt.wait(1);
 
     //get expert compatible appraisal requests
-    let appraisals = await NFTDaoContExpert.getAppraisalsForExpert({gasLimit:350000,gasPrice:gasPrice.toNumber()});
+    let appraisals = await NFTDContExpWithHis.getAppraisalsForExpert({gasLimit:350000,gasPrice:gasPrice.toNumber()});
     expect(appraisals.length).to.equal(2); 
     for(var i=0;i<appraisals.length;i++){
       //1st voter
-      let receipt = await NFTDaoContExpert.SubmitAppraisalVote(appraisals[i].appraisal_id,appraisal_sum);
+      let receipt = await NFTDContExpWithHis.SubmitAppraisalVote(appraisals[i].appraisal_id,appraisal_sum);
       let res = await receipt.wait(1);
 
-      receipt = await NFTDaoContExpert2.SubmitAppraisalVote(appraisals[i].appraisal_id,appraisal_sum);
-      res = await receipt.wait(1);
 
       console.log(`voted on appr ${appraisals[i].appraisal_id} `)
     }
@@ -173,8 +170,8 @@ describe("DecentralizedNFTDao Contract", function () {
     for(var i=0;i<appraisals.length;i++){
       let votes = await NFTDaoCont.getAppraisalVotes(appraisals[i].appraisal_id);
       //console.log(`votes for appr ${appraisals[i].appraisal_id} are ${votes}`)
-      expect(votes.length).to.equal(2);
-      expect(votes[0].voter).to.equal(expertSigner.address);
+      expect(votes.length).to.equal(1);
+      expect(votes[0].voter).to.equal(expertWithHistory.address);
       expect(votes[0].appraised_value_usd).to.equal(appraisal_sum);
     }
     

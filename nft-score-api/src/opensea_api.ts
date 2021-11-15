@@ -2,7 +2,9 @@ const querystring = require("querystring");
 const { curly } = require("node-libcurl");
 //import Curl from "node-libcurl";
 //import * as querystring from "querystring";
-const OPENSEA_BASE_URL = "https://api.opensea.io/api/v1/";
+
+const OPENSEA_BASE_URL = "https://rinkeby-api.opensea.io/api/v1/";
+//const OPENSEA_BASE_URL = "https://api.opensea.io/api/v1/";
 
 export async function openseaApiGet(service: string,params: Object ): Promise<Object | false> {
     //const curlOpensea = new Curl();
