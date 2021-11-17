@@ -1,9 +1,10 @@
 import React from 'react'
-
-const Header = () => {
+import ConnectButton from "./ConnectButton"
+const Header = ({connected,connectFunc}) => {
     return (
         <header>
            <h1>NFT Expert Appraisal</h1> 
+           <ConnectButton  connected={connected} connectFunc={connectFunc} />
         </header>
     )
 }
