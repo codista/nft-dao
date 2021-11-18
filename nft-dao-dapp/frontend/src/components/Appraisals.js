@@ -11,12 +11,18 @@ async function getAppraisals(contract) {
     return appraisals
 }
 
-async function addApprNFTData(apprsFromBC);
+async function addApprNFTData(apprsFromBC)
 {
+    if (apprsFromBC===null) return null;
     for(var i=0;i<apprsFromBC.length;i++)
     {
-        
+        let res = await fetch("http://localhost:3000/nft/data/"+apprsFromBC[i][2]+"/"+apprsFromBC[i][1]+"/",{headers: new Headers({
+            'Accept': 'application/json', 
+          })});
+        let jsn = await res.json();
+        console.log(jsn);
     }
+    return apprsFromBC;
 }
 
 const Appraisals = ({connected,cont}) => {
@@ -27,7 +33,7 @@ const Appraisals = ({connected,cont}) => {
         const getApprs = async (contract) => {
             const apprsFromBC = await getAppraisals(contract);
             const apprsWithNFT = await addApprNFTData(apprsFromBC);
-            setUserApprs(apprsFromBC);
+            setUserApprs(apprsWithNFT);
         }
         getApprs(cont);
     },[cont])
