@@ -14,6 +14,7 @@ import Header from "./components/Header"
 import { ethers } from "ethers";
 import { NFTEXP_CONTRACT_ADDRESS, NFTEXP_CONTRACT_ABI} from "./contracts/conf"
 import { requestUserConnect } from "./bootstrap/initialize"
+import Description from"./components/Description"
 
 function App() {
   const [connectedAccount,setConnectedAccount] = useState("");
@@ -51,9 +52,11 @@ function App() {
 
   return (
     <ChakraProvider theme={theme}>
-      <Box textAlign="center" fontSize="xl">
+      <Box textAlign="center" fontSize="l">
         <Header connected={connectedAccount} connectFunc={connectToMetamask}/>
-        <button onClick={submitApraisal}>submit appraisal</button>
+        <Box bgGradient="linear(to-b, #e3f4fa, white)" minH="1000" width="100%">
+        <Description />
+        </Box>
       </Box>
     </ChakraProvider>
   );
