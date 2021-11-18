@@ -3,6 +3,7 @@ import {useState} from 'react';
 import {
   ChakraProvider,
   Box,
+  Button,
   theme,
 } from '@chakra-ui/react';
 import Header from "./components/Header"
@@ -35,8 +36,8 @@ function App() {
     }
     const expertApprCont = new ethers.Contract(NFTEXP_CONTRACT_ADDRESS, NFTEXP_CONTRACT_ABI, ethersProvider.getSigner());
     try {
-      let tx = await expertApprCont.SubmitNFTForAppraisal("0x16baf0de678e52367adc69fd067e5edd1d33e3bf",
-      "5628",
+      let tx = await expertApprCont.SubmitNFTForAppraisal("0x495f947276749Ce646f68AC8c248420045cb7b5e",
+      "76691887242255780177254626155265856814632767606808225305714400988732330082305",
       "https://testnets.opensea.io/assets/0x16baf0de678e52367adc69fd067e5edd1d33e3bf/5628",
         5,
         1000,{value:2000000000000000});
@@ -54,9 +55,10 @@ function App() {
     <ChakraProvider theme={theme}>
       <Box textAlign="center" fontSize="l">
         <Header connected={connectedAccount} connectFunc={connectToMetamask}/>
+        <Button onClick={submitApraisal}>Submit</Button>
         <Box bgGradient="linear(to-b, #e3f4fa, white)" minH="1000" width="100%">
             <Description />
-            <Appraisals connected={connectedAccount} cont={ExpNFTCont} ></Appraisals>
+            <Appraisals connected={connectedAccount} cont={ExpNFTCont} prov={ethersProvider} ></Appraisals>
         </Box>
       </Box>
     </ChakraProvider>
