@@ -3,11 +3,6 @@ import {useState} from 'react';
 import {
   ChakraProvider,
   Box,
-  Text,
-  Link,
-  VStack,
-  Code,
-  Grid,
   theme,
 } from '@chakra-ui/react';
 import Header from "./components/Header"
@@ -15,16 +10,21 @@ import { ethers } from "ethers";
 import { NFTEXP_CONTRACT_ADDRESS, NFTEXP_CONTRACT_ABI} from "./contracts/conf"
 import { requestUserConnect } from "./bootstrap/initialize"
 import Description from"./components/Description"
+import Appraisals from "./components/Appraisals"
 
 function App() {
   const [connectedAccount,setConnectedAccount] = useState("");
   const [ethersProvider,setEthersProvider] = useState(null);
+  const [ExpNFTCont,SetExpNFTCont] = useState(null);
 
   async function connectToMetamask()
   {
     let {provider,account} = await requestUserConnect();
-    setConnectedAccount(account);
     setEthersProvider(provider);
+    const expertApprCont = new ethers.Contract(NFTEXP_CONTRACT_ADDRESS, NFTEXP_CONTRACT_ABI, provider.getSigner());
+    setConnectedAccount(account);
+    
+    SetExpNFTCont(expertApprCont);
   }
 
   async function submitApraisal()
@@ -55,7 +55,8 @@ function App() {
       <Box textAlign="center" fontSize="l">
         <Header connected={connectedAccount} connectFunc={connectToMetamask}/>
         <Box bgGradient="linear(to-b, #e3f4fa, white)" minH="1000" width="100%">
-        <Description />
+            <Description />
+            <Appraisals connected={connectedAccount} cont={ExpNFTCont} ></Appraisals>
         </Box>
       </Box>
     </ChakraProvider>
