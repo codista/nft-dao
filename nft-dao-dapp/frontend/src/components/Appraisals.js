@@ -18,41 +18,9 @@ async function addApprNFTData(apprsFromBC,provid)
 {
     if (apprsFromBC===null || provid===null) {console.log("got empty appraisals or provider to fetch nft data");return null;}
     
+   
+    
     for(var i=0;i<apprsFromBC.length;i++)
-    {
-        const NFTCont = new ethers.Contract(apprsFromBC[i][2], ERC721_ABI, provid.getSigner());
-        if (NFTCont!==null) {
-
-            let url="";
-            
-            try{
-                url= await NFTCont.tokenURI(apprsFromBC[i][1]);
-            } catch(err){
-                console.error(`got error in tokenURI fetch now trying erc1155`,err)
-                const NFTCont1155 = new ethers.Contract(apprsFromBC[i][2], ERC1155_ABI, provid.getSigner());
-                try {
-                    url= await NFTCont1155.uri(apprsFromBC[i][1]);
-                } catch(err) {console.error(`got error also in urierc1155`,err)}
-            
-            
-            }
-            if (url){
-                let res = await fetch(url,{headers: new Headers({
-                    'Accept': 'application/json', 
-                    })});
-                if (res.status=="200")
-                {
-                    let jsn = await res.json();
-                    console.log("client received nft META data: "+jsn);
-                    apprsFromBC[i][9] = jsn.image;
-                    apprsFromBC[i][10] = jsn.name;
-                }  
-                else {console.error("get error from metadata url fetch: ",res.status)}
-            }
-            
-        }
-    }
-    /*for(var i=0;i<apprsFromBC.length;i++)
     {
         let res;
         try {
@@ -73,7 +41,7 @@ async function addApprNFTData(apprsFromBC,provid)
         } catch(error) {
             console.error(`fetching nft data returned error ${error.message} `)
         } 
-    }*/
+    }
     return apprsFromBC;
 }
 

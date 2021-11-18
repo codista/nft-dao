@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var opensea = require("../build/src/opensea");
 const { curly } = require("node-libcurl");
+var blockchain = require("../build/src/blockchain")
 
 /* GET users listing. */
 router.get('/value/:contract/:id', async function(req, res, next) {
