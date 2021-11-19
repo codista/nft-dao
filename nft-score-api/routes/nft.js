@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var opensea = require("../build/src/opensea");
 const { curly } = require("node-libcurl");
-var blockchain = require("../build/src/blockchain")
+var blockchain = require("../build/src/blockchain");
 
 /* GET users listing. */
 router.get('/value/:contract/:id', async function(req, res, next) {
@@ -10,29 +10,19 @@ router.get('/value/:contract/:id', async function(req, res, next) {
     //console.log(x);
     //const orders = await opensea.getNFTValue("0x8cd8155e1af6ad31dd9eec2ced37e04145acfcb3","1808");
     const value = await opensea.getNFTValue(req.params.contract,req.params.id);
-    
     console.log(`value is ${value}`);
     res.send(value);   
 });
 
 router.get('/data/:contract/:id', async function(req, res, next) {
     
-    //const value = await opensea.getNFTValue(req.params.contract,req.params.id);
-    url="https://api.nftport.xyz/v0/nfts/"+req.params.contract+"/"+req.params.id+"?chain=ethereum";
-    const { statusCode, data, headers } = await curly.get(url, {
-        httpHeader: [
-            
-            'Accept: application/json',
-            'Authorization: edf0f0e5-a382-4023-8f39-c01a4d9326f8'
-        ],
-        })
-    //console.log(statusCode+" "+JSON.stringify(data)+" "+url);
-    if (statusCode!=200) {
-        console.error(`failed to retrieve inft info from nftport for url ${url} `,statusCode);
-        return false;
+    console.log("before router calling");
+    let data = await blockchain.getNftPortData(req.params.contract, req.params.id);
+    if (data===false) {
+        res.json({"response": "Error"});
+    } else {
+        res.json(data);
     }
-    console.log("received data from nftport is : "+data)
-    res.json(data);
 });
 
 

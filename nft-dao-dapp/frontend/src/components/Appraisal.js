@@ -1,10 +1,18 @@
-import { Box,Image,Stack,Heading,Avatar,Text,Center,useColorModeValue } from "@chakra-ui/react"
+import { Box,Image,Stack,Heading,Avatar,Text,Center,useColorModeValue,Table,Link,
+    Thead,
+    Tbody,
+    Tfoot,
+    Tr,
+    Th,
+    Td,
+    TableCaption } from "@chakra-ui/react"
 
 const Appraisal = ({data}) => {
+    var bHasNFTData=((data.nft_data!==undefined) && data.nft_data.response=="OK");
     return (
         <Center py={6}>
             <Box
-                maxW={'445px'}
+                maxW={'645px'}
                 w={'full'}
                 bg={useColorModeValue('white', 'gray.900')}
                 boxShadow={'2xl'}
@@ -12,51 +20,251 @@ const Appraisal = ({data}) => {
                 p={6}
                 overflow={'hidden'}>
                 <Box
-                h={'210px'}
-                bg={'gray.100'}
-                mt={-6}
-                mx={-6}
-                mb={6}
-                pos={'relative'}>
-                <Image
-                    src={
-                    'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
-                    }
-                    layout={'fill'}
-                />
+                    h={'210px'}
+                    bg={'gray.100'}
+                    mt={-6}
+                    mx={-6}
+                    mb={6}
+                    overflow={'hidden'}
+                    pos={'relative'}>
+                        
+                    <Image
+                        h={'210px'}
+                        src={
+                            bHasNFTData?data.nft_data.nft.file_url:''
+                        }
+                        
+                        layout={'responsive'}
+                        
+                    />
                 </Box>
                 <Stack>
-                <Text
-                    color={'green.500'}
-                    textTransform={'uppercase'}
-                    fontWeight={800}
-                    fontSize={'sm'}
-                    letterSpacing={1.1}>
-                    Blog
-                </Text>
-                <Heading
-                    color={useColorModeValue('gray.700', 'white')}
-                    fontSize={'2xl'}
-                    fontFamily={'body'}>
-                    Boost your conversion rate
-                </Heading>
-                <Text color={'gray.500'}>
-                    Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
-                    nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam
-                    erat, sed diam voluptua. At vero eos et accusam et justo duo dolores
-                    et ea rebum.
-                </Text>
+                    <Text
+                        color={'blue.500'}
+                        textTransform={'uppercase'}
+                        fontWeight={600}
+                        fontSize={'sm'}
+                        letterSpacing={1.1}>
+                        {bHasNFTData?data.nft_data.nft.metadata.name:'Unknown'}
+                    </Text>
+                    <Table size="sm" >
+                        <Tbody>
+                            <Tr>
+                                <Td>
+                                <Text
+                                    color={'gray.700'}
+                                    textTransform={'uppercase'}
+                                    fontWeight={600}
+                                    fontSize={'sm'}
+                                    letterSpacing={1.1}>
+                                    Contract Address:
+                                </Text>
+                                </Td>
+                                <Td>
+                                <Text
+                                    color={'gray.500'}
+                                    textTransform={'uppercase'}
+                                    fontWeight={600}
+                                    fontSize={'sm'}
+                                    letterSpacing={1.1}>
+                                    {data.nft_contract}
+                                </Text>
+                                </Td>
+                            </Tr>
+                            <Tr>
+                                <Td>
+                                <Text
+                                    color={'gray.700'}
+                                    textTransform={'uppercase'}
+                                    fontWeight={600}
+                                    fontSize={'sm'}
+                                    letterSpacing={1.1}>
+                                    NFT ID:
+                                </Text>
+                                </Td>
+                                <Td>
+                                <Text
+                                    color={'gray.500'}
+                                    textTransform={'uppercase'}
+                                    fontWeight={600}
+                                    fontSize={'sm'}
+                                    letterSpacing={1.1}>
+                                    {data.nft_id.toString()}
+                                </Text>
+                                </Td>
+                            </Tr>
+
+                            <Tr>
+                                <Td>
+                                <Text
+                                    color={'gray.700'}
+                                    textTransform={'uppercase'}
+                                    fontWeight={600}
+                                    fontSize={'sm'}
+                                    letterSpacing={1.1}>
+                                    Appraisal Status:
+                                </Text>
+                                </Td>
+                                <Td>
+                                <Text
+                                    color={'gray.500'}
+                                    textTransform={'uppercase'}
+                                    fontWeight={600}
+                                    fontSize={'sm'}
+                                    letterSpacing={1.1}>
+                                    {data.status==0?'Open for Voting':data.status==1?'Resolved':'failed'}
+                                </Text>
+                                </Td>
+                            </Tr>
+
+                            <Tr>
+                                <Td>
+                                <Text
+                                    color={'gray.700'}
+                                    textTransform={'uppercase'}
+                                    fontWeight={600}
+                                    fontSize={'sm'}
+                                    letterSpacing={1.1}>
+                                    Minimum Voters to Resolve:
+                                </Text>
+                                </Td>
+                                <Td>
+                                <Text
+                                    color={'gray.500'}
+                                    textTransform={'uppercase'}
+                                    fontWeight={600}
+                                    fontSize={'sm'}
+                                    letterSpacing={1.1}>
+                                    {data.minVoters}
+                                </Text>
+                                </Td>
+                            </Tr>
+
+                            <Tr>
+                                <Td>
+                                <Text
+                                    color={'gray.700'}
+                                    textTransform={'uppercase'}
+                                    fontWeight={600}
+                                    fontSize={'sm'}
+                                    letterSpacing={1.1}>
+                                    Minimum Score to Vote:
+                                </Text>
+                                </Td>
+                                <Td>
+                                <Text
+                                    color={'gray.500'}
+                                    textTransform={'uppercase'}
+                                    fontWeight={600}
+                                    fontSize={'sm'}
+                                    letterSpacing={1.1}>
+                                    {data.minExpertiseLevel.toString()}
+                                </Text>
+                                </Td>
+                            </Tr>
+
+                            <Tr>
+                                <Td>
+                                <Text
+                                    color={'gray.700'}
+                                    textTransform={'uppercase'}
+                                    fontWeight={600}
+                                    fontSize={'sm'}
+                                    letterSpacing={1.1}>
+                                    Payout (Eth):
+                                </Text>
+                                </Td>
+                                <Td>
+                                <Text
+                                    color={'gray.500'}
+                                    textTransform={'uppercase'}
+                                    fontWeight={600}
+                                    fontSize={'sm'}
+                                    letterSpacing={1.1}>
+                                    {data.paymentEth.toNumber()/10**18}
+                                </Text>
+                                </Td>
+                            </Tr>
+
+                            <Tr>
+                                <Td>
+                                <Text
+                                    color={'gray.700'}
+                                    textTransform={'uppercase'}
+                                    fontWeight={600}
+                                    fontSize={'sm'}
+                                    letterSpacing={1.1}>
+                                    Submitted On:
+                                </Text>
+                                </Td>
+                                <Td>
+                                <Text
+                                    color={'gray.500'}
+                                    textTransform={'uppercase'}
+                                    fontWeight={600}
+                                    fontSize={'sm'}
+                                    letterSpacing={1.1}>
+                                    {new Date(data.request_time.toNumber() * 1000 ).toLocaleDateString("en-US")}
+                                </Text>
+                                </Td>
+                            </Tr>
+
+                            <Tr>
+                                <Td>
+                                <Text
+                                    color={'gray.700'}
+                                    textTransform={'uppercase'}
+                                    fontWeight={600}
+                                    fontSize={'sm'}
+                                    letterSpacing={1.1}>
+                                    Project URL:
+                                </Text>
+                                </Td>
+                                <Td>
+                                <Text
+                                    color={'blue.500'}
+                                    textTransform={'uppercase'}
+                                    fontWeight={600}
+                                    fontSize={'sm'}
+                                    letterSpacing={1.1}>
+                                    {bHasNFTData? <Link href={data.nft_data.nft.metadata.external_url}>data.nft_data.nft.metadata.external_url</Link>:'Unknown'}
+                                </Text>
+                                </Td>
+                            </Tr>
+
+                            {
+                                data.nftMarketplace!==""?
+                                <Tr>
+                                <Td>
+                                <Text
+                                    color={'gray.700'}
+                                    textTransform={'uppercase'}
+                                    fontWeight={600}
+                                    fontSize={'sm'}
+                                    letterSpacing={1.1}>
+                                    Marketplace URL:
+                                </Text>
+                                </Td>
+                                <Td>
+                                <Text
+                                    color={'blue.500'}
+                                    textTransform={'uppercase'}
+                                    fontWeight={600}
+                                    fontSize={'sm'}
+                                    letterSpacing={1.1}>
+                                    <Link href={data.nftMarketplace}>{data.nftMarketplace}</Link>
+                                </Text>
+                                </Td>
+                            </Tr>
+                                :''
+                            }
+
+
+                        </Tbody>
+                    </Table>
+                    
                 </Stack>
-                <Stack mt={6} direction={'row'} spacing={4} align={'center'}>
-                <Avatar
-                    src={'https://avatars0.githubusercontent.com/u/1164541?v=4'}
-                    alt={'Author'}
-                />
-                <Stack direction={'column'} spacing={0} fontSize={'sm'}>
-                    <Text fontWeight={600}>Achim Rolle</Text>
-                    <Text color={'gray.500'}>Feb 08, 2021 · 6min read</Text>
-                </Stack>
-                </Stack>
+                
             </Box>
         </Center>
     )

@@ -36,8 +36,8 @@ function App() {
     }
     const expertApprCont = new ethers.Contract(NFTEXP_CONTRACT_ADDRESS, NFTEXP_CONTRACT_ABI, ethersProvider.getSigner());
     try {
-      let tx = await expertApprCont.SubmitNFTForAppraisal("0x495f947276749Ce646f68AC8c248420045cb7b5e",
-      "76691887242255780177254626155265856814632767606808225305714400988732330082305",
+      let tx = await expertApprCont.SubmitNFTForAppraisal("0x8cd8155e1af6ad31dd9eec2ced37e04145acfcb3",
+      "1808",
       "https://testnets.opensea.io/assets/0x16baf0de678e52367adc69fd067e5edd1d33e3bf/5628",
         5,
         1000,{value:2000000000000000});
@@ -47,7 +47,7 @@ function App() {
     }
 
     let appraisals = await expertApprCont.getUserAppraisalRequests();
-    console.log(appraisals);
+    console.log("after submitting appraisal we get these apprs: "+appraisals);
 
   }
 
