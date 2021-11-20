@@ -6,9 +6,20 @@ import { Box,Image,Stack,Heading,Avatar,Text,Center,useColorModeValue,Table,Link
     Th,
     Td,
     TableCaption } from "@chakra-ui/react"
+    import {ETH_PRECISION} from "./../contracts/conf"     
+
+function weiToEthFloat(wei)
+{
+    let weiTemp=wei.div(10 ** (18-ETH_PRECISION));
+    let num = weiTemp.toNumber();
+    num=num/(10 ** ETH_PRECISION);
+    return num;
+}    
 
 const Appraisal = ({data}) => {
     var bHasNFTData=((data.nft_data!==undefined) && data.nft_data.response=="OK");
+
+
     return (
         <Center py={6}>
             <Box
@@ -181,7 +192,7 @@ const Appraisal = ({data}) => {
                                     fontWeight={600}
                                     fontSize={'sm'}
                                     letterSpacing={1.1}>
-                                    {data.paymentEth.toNumber()/10**18}
+                                    {weiToEthFloat(data.paymentEth)}
                                 </Text>
                                 </Td>
                             </Tr>
@@ -227,7 +238,7 @@ const Appraisal = ({data}) => {
                                     fontWeight={600}
                                     fontSize={'sm'}
                                     letterSpacing={1.1}>
-                                    {bHasNFTData? <Link href={data.nft_data.nft.metadata.external_url}>data.nft_data.nft.metadata.external_url</Link>:'Unknown'}
+                                    {bHasNFTData? <Link href={data.nft_data.nft.metadata.external_url}>{data.nft_data.nft.metadata.external_url}</Link>:'Unknown'}
                                 </Text>
                                 </Td>
                             </Tr>

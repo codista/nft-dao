@@ -1,4 +1,5 @@
 export const NFTEXP_CONTRACT_ADDRESS="0x4292f3A48c83b9a57b73A9ea5405b4CF87e0B8FA";
+export const ETH_PRECISION  = 6;
 export const ERC1155_ABI = [
   {
     "inputs": [

@@ -77,6 +77,20 @@ import { Flex,
             return error
         }
 
+        function validatePayout(value) {
+            let error
+            if (!value) {
+            error = "Must specify payment"
+            } else { 
+                let x=Number(value); 
+                if (isNaN(x) || x<0.002 || x>100) {
+                    error = "Must be a number, minimum payment is 0.002 Eth, maximum is 100"
+                }
+            }
+            return error
+        }
+        
+
         
         //bg={useColorModeValue('gray.50', 'gray.800')}
         //bg={useColorModeValue('white', 'gray.700')}
@@ -156,6 +170,16 @@ import { Flex,
                                             <FormLabel htmlFor="minExpertLevel">Minimum Expert Score to Vote</FormLabel>
                                             <Input {...field} id="minExpertLevel" placeholder="minExpertLevel" />
                                             <FormErrorMessage>{form.errors.minExpertLevel}</FormErrorMessage>
+                                        </FormControl>
+                                        )}
+                                    </Field>
+
+                                    <Field name="payout" validate={validatePayout}>
+                                        {({ field, form }) => (
+                                        <FormControl isInvalid={form.errors.payout && form.touched.payout}>
+                                            <FormLabel htmlFor="payout">Payment in Eth</FormLabel>
+                                            <Input {...field} id="payout" placeholder="payout" />
+                                            <FormErrorMessage>{form.errors.payout}</FormErrorMessage>
                                         </FormControl>
                                         )}
                                     </Field>

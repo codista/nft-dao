@@ -3,6 +3,8 @@ import { VStack,Box,Text,Flex,Heading } from "@chakra-ui/react"
 import Appraisal from "./Appraisal"
 import {useState, useEffect} from "react"
 import AddAppraisal from "./AddAppraisal"
+import {ETH_PRECISION} from "./../contracts/conf"
+import {BigNumber} from "ethers"
 
 async function getAppraisals(contract) {
     let appraisals=null;
@@ -79,8 +81,27 @@ const Appraisals = ({connected,cont,prov}) => {
         getApprs(cont,prov);
     },[cont,prov])
 
-    function AddAppraisalF(appr) {
-        alert("here "+JSON.stringify(appr));
+    function floatSTRToBGWei(fl) {
+        let flPerc = Math.round(Number(fl)*(10 ** ETH_PRECISION));
+        let BGWei = BigNumber.from(flPerc);
+        return BGWei.mul(10 ** (18-ETH_PRECISION));
+    }
+
+    async function AddAppraisalF(appr) {
+        //alert("here "+JSON.stringify(appr));
+        if (cont===undefined || cont===null) {alert("could not add appraisal request. Pleasse make sure your wallet is connected");return;}
+        
+        try {
+            let tx = await cont.SubmitNFTForAppraisal(appr.nftContract,
+            appr.NFTId,
+            appr.NFTMarketplace,
+              appr.minVoters,
+              appr.minExpertLevel,{value:floatSTRToBGWei(appr.payout)});
+            let receipt = tx.wait(1);
+        } catch(error){
+            alert("failed to submit appraisal");
+            return;
+        }   
     }
 
     return (
