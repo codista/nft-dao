@@ -1,3 +1,6 @@
+import * as dotenv from "dotenv";
+dotenv.config();
+
 function copyApprData(obj)
 {
     var ret = {
@@ -28,7 +31,7 @@ export async function addApprNFTData(apprsFromBC,provid)
     {
         let res;
         try {
-            let url=  "http://localhost:3000/nft/data/"+apprsFromBC[i][2]+"/"+apprsFromBC[i][1]+"/";
+            let url=  process.env.API_URL+"/"+apprsFromBC[i][2]+"/"+apprsFromBC[i][1]+"/";
             res = await fetch(url,{headers: new Headers({
             'Accept': 'application/json', 
             })});
