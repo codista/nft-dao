@@ -3,7 +3,11 @@ import {useState} from 'react';
 import {
   ChakraProvider,
   Box,
-  Button,
+  Tabs,
+  Tab,
+  TabList,
+  TabPanels,
+  TabPanel,
   theme,
 } from '@chakra-ui/react';
 import Header from "./components/Header"
@@ -12,6 +16,7 @@ import { NFTEXP_CONTRACT_ADDRESS, NFTEXP_CONTRACT_ABI} from "./contracts/conf"
 import { requestUserConnect } from "./bootstrap/initialize"
 import Description from"./components/Description"
 import Appraisals from "./components/Appraisals"
+import AppraisalVotes from "./components/AppraisalVotes"
 
 function App() {
   const [connectedAccount,setConnectedAccount] = useState("");
@@ -20,45 +25,47 @@ function App() {
 
   async function connectToMetamask()
   {
-    let {provider,account} = await requestUserConnect();
+    let provider = await requestUserConnect();
     setEthersProvider(provider);
+    let address = await provider.getSigner().getAddress();
     const expertApprCont = new ethers.Contract(NFTEXP_CONTRACT_ADDRESS, NFTEXP_CONTRACT_ABI, provider.getSigner());
-    setConnectedAccount(account);
+   
+    setConnectedAccount(address);
     
     SetExpNFTCont(expertApprCont);
+    window.ethereum.on('accountsChanged', function (accounts) {
+      const prov = new ethers.providers.Web3Provider(window.ethereum, "any");
+      setEthersProvider(prov);
+      const expertApprCont = new ethers.Contract(NFTEXP_CONTRACT_ADDRESS, NFTEXP_CONTRACT_ABI, provider.getSigner());
+      SetExpNFTCont(expertApprCont);
+      setConnectedAccount(accounts[0]);
+    })
   }
 
-  async function submitApraisal()
-  {
-    if (ethersProvider===null) {
-      alert("please connect wallet first");
-      return;
-    }
-    const expertApprCont = new ethers.Contract(NFTEXP_CONTRACT_ADDRESS, NFTEXP_CONTRACT_ABI, ethersProvider.getSigner());
-    try {
-      let tx = await expertApprCont.SubmitNFTForAppraisal("0x8cd8155e1af6ad31dd9eec2ced37e04145acfcb3",
-      "1808",
-      "https://testnets.opensea.io/assets/0x16baf0de678e52367adc69fd067e5edd1d33e3bf/5628",
-        5,
-        1000,{value:2000000000000000});
-      let receipt = tx.wait(1);
-    } catch(error){
-      alert("failed to submit appraisal");
-    }
-
-    let appraisals = await expertApprCont.getUserAppraisalRequests();
-    console.log("after submitting appraisal we get these apprs: "+appraisals);
-
-  }
+  
 
   return (
     <ChakraProvider theme={theme}>
       <Box textAlign="center" fontSize="l">
         <Header connected={connectedAccount} connectFunc={connectToMetamask}/>
-        <Button onClick={submitApraisal}>Submit</Button>
+        
         <Box bgGradient="linear(to-b, #e3f4fa, white)" minH="1000" width="100%">
             <Description />
-            <Appraisals connected={connectedAccount} cont={ExpNFTCont} prov={ethersProvider} ></Appraisals>
+            <Tabs  colorScheme="blue"  padding="20" >
+              <TabList>
+                <Tab>Your Appraisal Requests</Tab>
+                <Tab>Vote on Appraisal Requests</Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel>
+                  <Appraisals connected={connectedAccount} cont={ExpNFTCont} prov={ethersProvider} ></Appraisals>
+                </TabPanel>
+                <TabPanel>
+                <AppraisalVotes connected={connectedAccount} cont={ExpNFTCont} prov={ethersProvider} ></AppraisalVotes>
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+            
         </Box>
       </Box>
     </ChakraProvider>

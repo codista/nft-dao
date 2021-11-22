@@ -1,5 +1,5 @@
 
-import {Button} from '@chakra-ui/react';
+import {Button,Text} from '@chakra-ui/react';
 const ConnectButton = ({connected, connectFunc}) => {
     async function  callConnect() {
         await connectFunc();
@@ -11,9 +11,11 @@ const ConnectButton = ({connected, connectFunc}) => {
             Connect to Metamask
         </Button>
         :
-        <Button colorScheme="blue" >
+        <Text color={'black'}>
+            
             Connected to {connected}
-        </Button>
+            
+            </Text>
     )
 }
 

@@ -1,82 +1,41 @@
 
-import { VStack,Box,Text,Flex,Heading } from "@chakra-ui/react"
+import { VStack,Box,Text,Spinner } from "@chakra-ui/react"
 import Appraisal from "./Appraisal"
 import {useState, useEffect} from "react"
 import AddAppraisal from "./AddAppraisal"
 import {ETH_PRECISION} from "./../contracts/conf"
 import {BigNumber} from "ethers"
+import {addApprNFTData} from "./helpers"
 
-async function getAppraisals(contract) {
+async function getAppraisals(contract,provid) {
     let appraisals=null;
     if (contract!==null)
         appraisals = await contract.getUserAppraisalRequests();
-    console.log("get appraisals is called from comp and gets these: "+appraisals);    
-    return appraisals
+    //console.log("get appraisals is called from comp and gets these: "+appraisals);    
+    let apprsWithData = await addApprNFTData(appraisals,provid);
+    if (apprsWithData===null)
+        return appraisals;
+    else    
+        return apprsWithData;
 }
 
-function copyApprData(obj)
-{
-    var ret = {
-        appraisal_id: obj.appraisal_id,
-        nft_id: obj.nft_id,
-        nft_contract: obj.nft_contract,
-        status: obj.status,
-        request_time: obj.request_time,
-        minVoters: obj.minVoters,
-        minExpertiseLevel: obj.minExpertiseLevel,
-        paymentEth: obj.paymentEth,
-        nftMarketplace: obj.nftMarketplace,
-        nft_data: {}
-    }
-    return ret;
-    
-}
 
-async function addApprNFTData(apprsFromBC,provid)
-{
-    console.log("add nft data starts with these: "+apprsFromBC);    
-    var returnData = [];
-    if (apprsFromBC===null || provid===null) {console.log("got empty appraisals or provider to fetch nft data");return null;}
-    
-   
-    
-    for(var i=0;i<apprsFromBC.length;i++)
-    {
-        let res;
-        try {
-            //let url="http://localhost:3000/nft/data/0x8cd8155e1af6ad31dd9eec2ced37e04145acfcb3/1808"
-            let url=  "http://localhost:3000/nft/data/"+apprsFromBC[i][2]+"/"+apprsFromBC[i][1]+"/";
-            res = await fetch(url,{headers: new Headers({
-            'Accept': 'application/json', 
-            })});
-            if (res.status=="200")
-            {
-                let jsn = await res.json();
-                console.log("client received nft data: "+JSON.stringify(jsn));
-                returnData[i] = copyApprData(apprsFromBC[i]);
-                returnData[i].nft_data=jsn;
-            }  
-            else {
-                console.error(`fetching nft data returned error ${res.status} `)
-            }
-        } catch(error) {
-            console.error(`fetching nft data returned error ${error.message} `)
-        } 
-    }
-    console.log("add nft data about to return: "+returnData); 
-    return returnData;
-}
+
+
 
 const Appraisals = ({connected,cont,prov}) => {
 
     const [userApprs,setUserApprs] = useState(null);
+    const [fetchingApprs,setFetchingApprs] = useState(false);
 
     useEffect(() => {
-        const getApprs = async (contract,provid) => {
-            const apprsFromBC = await getAppraisals(contract);
-            const apprsWithNFT = await addApprNFTData(apprsFromBC,provid);
-            console.log("add nft data returned: "+apprsWithNFT); 
-            setUserApprs(apprsWithNFT);
+        const getApprs = async (cont,prov) => {
+            if (cont!==null) {
+                setFetchingApprs(true);
+                const apprsFromBC = await getAppraisals(cont,prov);
+                setFetchingApprs(false);
+                setUserApprs(apprsFromBC);
+            }
         }
         getApprs(cont,prov);
     },[cont,prov])
@@ -102,17 +61,22 @@ const Appraisals = ({connected,cont,prov}) => {
             alert("failed to submit appraisal");
             return;
         }   
+        let appraisals = await getAppraisals(cont,prov);
+        setUserApprs(appraisals);
+
     }
 
     return (
             <Box>
-                
-                
-                <Heading>{(connected!=="" && userApprs!==null && userApprs.length>0)?'Here Are Your Appraisales':(connected!=="")?'You Haven\'t submitted any appraisal requests yet, please use the form below to add one.':'Please Connect Metamask to get started'}</Heading>
-                {(connected!=="")?<AddAppraisal AddAppraisalFunc={AddAppraisalF}/>:''}
-                {(userApprs && userApprs.length>0)?(userApprs.map((appr) => (<Appraisal data={appr} id={appr.appraisal_id} key={appr.appraisal_id}/>))):''}
-                
-        
+                {fetchingApprs ? <Spinner size="xl" />: 
+                    <Box>
+                    {connected===""?<Text>Please Connect Metamask to get started</Text>:''}
+                    {connected!=="" && (userApprs===null || userApprs.length==0)?<Text>You Haven't submitted any appraisal requests yet, please use the form below to add one.</Text>:''}
+                    {(connected!=="" )?<AddAppraisal AddAppraisalFunc={AddAppraisalF}/>:''}
+                    {(connected!=="" && userApprs && userApprs.length>0)?<Text>Your Existing NFT Appraisal Requests</Text>:''}
+                    {(connected!=="" && userApprs && userApprs.length>0)?(userApprs.map((appr) => (<Appraisal data={appr} type="User" id={appr.appraisal_id} cont={cont} prov={prov} key={appr.appraisal_id}/>))):''}
+                    </Box>
+                }    
             </Box>
         
     )

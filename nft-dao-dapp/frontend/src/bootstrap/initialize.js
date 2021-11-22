@@ -38,7 +38,7 @@ export async function requestUserConnect()
         }
         const prov = new ethers.providers.Web3Provider(window.ethereum, "any");
         console.log("acounts is "+accounts);
-        return {provider: prov,account: accounts[0]};
+        return prov;
     }
     else {
         console.log("failed");

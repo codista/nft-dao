@@ -47,8 +47,10 @@ async function main() {
   let receipt: any = await response.wait(1);
 
   let auth: boolean = await orac_contract_obj.getAuthorizationStatus(chNodeAddr);
+  let authWrong: boolean = await orac_contract_obj.getAuthorizationStatus("0x8a90CAb2b38dba80c64b7734e58Ee1dB38B8992e");
+  
 
-  console.log('Chainlink node added to oracle contract: '+auth);
+  console.log(`Chainlink node added to oracle contract: ${auth} and false address is ${authWrong}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

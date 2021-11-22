@@ -111,6 +111,12 @@ contract DecentralizedNFTDao is ChainlinkClient, ConfirmedOwner {
         experts[req_id_to_exp[_requestId]].status = ExpertEvaluationStatus.Resolved;
     }
 
+    function getAppraisalStatus(uint256 appraisal_id) public view returns (NFTAppraisalStatus)
+    {
+        require(appraisal_id<appraisals.length,"apriasal ID does not exist");
+        return appraisals[appraisal_id].status;
+    }
+
     function getUserAppraisalRequests() public view returns(NFTApprisalRequest[] memory)
     {
         NFTApprisalRequest[] memory filtered;
@@ -153,6 +159,21 @@ contract DecentralizedNFTDao is ChainlinkClient, ConfirmedOwner {
         return filtered;
     }
 
+    function getExpertVote(uint256 appraisal_id,address expert_address) public view returns (uint256) {
+        require(appraisal_id<appraisals.length,"apriasal ID does not exist");
+        if (appraisal_voters[appraisal_id][expert_address]==false) return 0;
+        uint256 value=0;
+        for (uint i=0; i<appraisal_votes[appraisal_id].length;i++) {
+            if (appraisal_votes[appraisal_id][i].voter==expert_address) {
+                value= appraisal_votes[appraisal_id][i].appraised_value_usd;
+                break;
+            }
+        }
+        return value;
+    }
+
+
+
     //expert Vote
     function SubmitAppraisalVote(uint256 appraisal_id,uint256 USDValue) public onlyExpert {
 
@@ -169,6 +190,9 @@ contract DecentralizedNFTDao is ChainlinkClient, ConfirmedOwner {
         appraisal_votes[appraisal_id].push(Vote(msg.sender,USDValue));
 
         //handle resolution (should be handled externally later when time limit is added)
+        if (appraisal_votes[appraisal_id].length>=appraisals[appraisal_id].minVoters) {
+            appraisals[appraisal_id].status=NFTAppraisalStatus.Resolved;
+        }
         
     }
 
@@ -176,7 +200,7 @@ contract DecentralizedNFTDao is ChainlinkClient, ConfirmedOwner {
 
     //join Dao
     function JoinDao() public {
-        require(experts[msg.sender].initialized==false,"Expert is already a member");
+        require(experts[msg.sender].initialized==false || experts[msg.sender].status==ExpertEvaluationStatus.Pending,"Expert is already a member");
         experts[msg.sender]=Expert(0,ExpertEvaluationStatus.Pending,true);
         bytes32 reqId = requestExpertiseScore(msg.sender);
         req_id_to_exp[reqId]=msg.sender;
@@ -258,7 +282,7 @@ contract DecentralizedNFTDao is ChainlinkClient, ConfirmedOwner {
       _;
    }
 
-    function toAsciiString(address x) public returns (string memory) {
+    function toAsciiString(address x) public pure returns (string memory) {
         bytes memory s = new bytes(40);
         for (uint i = 0; i < 20; i++) {
             bytes1 b = bytes1(uint8(uint(uint160(x)) / (2**(8*(19 - i)))));
@@ -271,7 +295,7 @@ contract DecentralizedNFTDao is ChainlinkClient, ConfirmedOwner {
     }
 
 
-    function char(bytes1 b) public returns (bytes1 c) {
+    function char(bytes1 b) public pure returns (bytes1 c) {
 
         if (uint8(b) < 10) return bytes1(uint8(b) + 0x30);
         else return bytes1(uint8(b) + 0x57);

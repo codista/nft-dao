@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { ethers,artifacts } from "hardhat";
-import type { Contract } from "ethers";
+import type { Contract,BigNumber } from "ethers";
 import * as dotenv from "dotenv";
 import  { DecentralizedNFTDao } from "../typechain";
 import * as confs from "./conf";
@@ -126,5 +126,51 @@ describe("DecentralizedNFTDao Contract", function () {
     }
     
   });
+
+  it("Should retrieve vote correctly", async function () {
+
+    let receipt = await LINKCont.transfer(NFTDaoCont.address,(((Math.pow(10,18)))).toString(),{gasLimit:350000,gasPrice:gasPriceWei});
+      let ret = await receipt.wait(1);    
+
+    let NFTDContExp = NFTDaoCont.connect(expertSigner);
+    let NFTDContExp2 = NFTDaoCont.connect(expertSigner2);
+    let NFTDContExp3 = NFTDaoCont.connect(expertSigner3);
+    
+    
+    await helpers.joinDao(NFTDContExp,gasPriceWei);
+    let score = await helpers.waitForChainlinkScore(NFTDContExp,expertSigner.address) as  number;
+    await helpers.joinDao(NFTDContExp2,gasPriceWei);
+    let score2 = await helpers.waitForChainlinkScore(NFTDContExp2,expertSigner2.address) as  number;
+    await helpers.joinDao(NFTDContExp3,gasPriceWei);
+    let score3 = await helpers.waitForChainlinkScore(NFTDContExp3,expertSigner3.address) as  number;
+    
+    
+    await helpers.submitAppraisal(NFTDaoCont,confs.NFT_ID,confs.NFT_CONTRACT,confs.NFT_URL,3,0,gasPriceWei,2000000000000000);
+    await helpers.submitAppraisal(NFTDaoCont,"2000",confs.NFT_CONTRACT,confs.NFT_URL,3,0,gasPriceWei,2000000000000000);
+
+    //get expert compatible appraisal requests
+    let appraisals = await NFTDContExp.getAppraisalsForExpert({gasLimit:350000,gasPrice:gasPriceWei});
+    expect(appraisals.length).to.equal(2);
+
+    //vote on one appraisal (3 different votes)
+    await helpers.vote(NFTDContExp,appraisals[0].appraisal_id.toNumber(),confs.APPRAISAL_SUM);
+    await helpers.vote(NFTDContExp2,appraisals[0].appraisal_id.toNumber(),confs.APPRAISAL_SUM);
+    await helpers.vote(NFTDContExp3,appraisals[0].appraisal_id.toNumber(),confs.APPRAISAL_SUM);
+    
+    let apprstatus = await NFTDaoCont.getAppraisalStatus(appraisals[0].appraisal_id);
+    
+    let vote = await NFTDaoCont.getExpertVote(appraisals[0].appraisal_id.toNumber(),expertSigner.address);
+      
+    
+     
+      expect(vote.toNumber()).to.equal(confs.APPRAISAL_SUM);
+      
+      expect(apprstatus).to.equal(1);
+      
+      console.log(`last deployed contract at ${NFTDaoCont.address}`);
+      //expect(votes[0].appraised_value_usd).to.equal(confs.APPRAISAL_SUM);
+    });
+    
+  
 
 });

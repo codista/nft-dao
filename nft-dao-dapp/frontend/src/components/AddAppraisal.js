@@ -1,5 +1,6 @@
 import { Flex,
     Box,
+    Center,
     FormControl,
     FormLabel,
     Input,
@@ -67,7 +68,7 @@ import { Flex,
         function validateExpertLevel(value) {
             let error
             if (!value) {
-            error = "Minimum Voters is Required"
+            error = "Minimum Expert Score is Required"
             } else { 
                 let x=parseInt(value); 
                 if (isNaN(x) || x<0 || x>10000) {
@@ -83,8 +84,8 @@ import { Flex,
             error = "Must specify payment"
             } else { 
                 let x=Number(value); 
-                if (isNaN(x) || x<0.002 || x>100) {
-                    error = "Must be a number, minimum payment is 0.002 Eth, maximum is 100"
+                if (isNaN(x) || x<0.001 || x>100) {
+                    error = "Must be a number, minimum payment is 0.001 Eth, maximum is 100"
                 }
             }
             return error
@@ -96,13 +97,13 @@ import { Flex,
         //bg={useColorModeValue('white', 'gray.700')}
         return (
             
-                <Flex
-                minH={'100vh'}
+                <Center
+                
                 align={'center'}
                 justify={'center'}
                 >
                 <Formik
-                    initialValues={{ nftContract: "", NFTId: "",NFTMarketplace: "",minVoters: "",minExpertLevel:""}}
+                    initialValues={{ nftContract: "", NFTId: "",NFTMarketplace: "",minVoters: "",minExpertLevel:"",payout:"0.001"}}
                     onSubmit={(values, actions) => {
                     setTimeout(() => {
                         //alert(JSON.stringify(values, null, 2))
@@ -115,7 +116,7 @@ import { Flex,
                         <Form>
                             <Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
                                 <Stack align={'center'}>
-                                <Heading fontSize={'4xl'}>Submit a New NFT Appraisal Request</Heading>
+                                <Text fontSize={'4xl'}>Submit a New NFT Appraisal Request</Text>
                                 </Stack>
                                 <Box
                                 rounded={'lg'}
@@ -126,7 +127,7 @@ import { Flex,
 
                                     <Field name="nftContract" validate={validateContract}>
                                         {({ field, form }) => (
-                                        <FormControl isInvalid={form.errors.nftContract && form.touched.nftContract}>
+                                        <FormControl isRequired isInvalid={form.errors.nftContract && form.touched.nftContract}>
                                             <FormLabel htmlFor="nftContract">NFT Contract Address</FormLabel>
                                             <Input {...field} id="nftContract" placeholder="nftContract" />
                                             <FormErrorMessage>{form.errors.nftContract}</FormErrorMessage>
@@ -134,9 +135,9 @@ import { Flex,
                                         )}
                                     </Field>
 
-                                    <Field name="NFTId" validate={validateID}>
+                                    <Field name="NFTId"  validate={validateID}>
                                         {({ field, form }) => (
-                                        <FormControl isInvalid={form.errors.NFTId && form.touched.NFTId}>
+                                        <FormControl isRequired isInvalid={form.errors.NFTId && form.touched.NFTId}>
                                             <FormLabel htmlFor="NFTId">NFT ID</FormLabel>
                                             <Input {...field} id="NFTId" placeholder="NFTId" />
                                             <FormErrorMessage>{form.errors.NFTId}</FormErrorMessage>
@@ -154,9 +155,9 @@ import { Flex,
                                         )}
                                     </Field>
 
-                                    <Field name="minVoters" validate={validateMinVoters}>
+                                    <Field name="minVoters"  validate={validateMinVoters}>
                                         {({ field, form }) => (
-                                        <FormControl isInvalid={form.errors.minVoters && form.touched.minVoters}>
+                                        <FormControl isRequired isInvalid={form.errors.minVoters && form.touched.minVoters}>
                                             <FormLabel htmlFor="minVoters">Minimum Required Voters</FormLabel>
                                             <Input {...field} id="minVoters" placeholder="minVoters" />
                                             <FormErrorMessage>{form.errors.minVoters}</FormErrorMessage>
@@ -164,9 +165,9 @@ import { Flex,
                                         )}
                                     </Field>
 
-                                    <Field name="minExpertLevel" validate={validateExpertLevel}>
+                                    <Field name="minExpertLevel"  validate={validateExpertLevel}>
                                         {({ field, form }) => (
-                                        <FormControl isInvalid={form.errors.minExpertLevel && form.touched.minExpertLevel}>
+                                        <FormControl isRequired isInvalid={form.errors.minExpertLevel && form.touched.minExpertLevel}>
                                             <FormLabel htmlFor="minExpertLevel">Minimum Expert Score to Vote</FormLabel>
                                             <Input {...field} id="minExpertLevel" placeholder="minExpertLevel" />
                                             <FormErrorMessage>{form.errors.minExpertLevel}</FormErrorMessage>
@@ -174,9 +175,9 @@ import { Flex,
                                         )}
                                     </Field>
 
-                                    <Field name="payout" validate={validatePayout}>
+                                    <Field name="payout"  validate={validatePayout}>
                                         {({ field, form }) => (
-                                        <FormControl isInvalid={form.errors.payout && form.touched.payout}>
+                                        <FormControl isRequired isInvalid={form.errors.payout && form.touched.payout}>
                                             <FormLabel htmlFor="payout">Payment in Eth</FormLabel>
                                             <Input {...field} id="payout" placeholder="payout" />
                                             <FormErrorMessage>{form.errors.payout}</FormErrorMessage>
@@ -203,7 +204,7 @@ import { Flex,
                     )}
                 
                 </Formik>
-                </Flex>
+                </Center>
             
         )
     }

@@ -6,7 +6,9 @@ import { Box,Image,Stack,Heading,Avatar,Text,Center,useColorModeValue,Table,Link
     Th,
     Td,
     TableCaption } from "@chakra-ui/react"
-    import {ETH_PRECISION} from "./../contracts/conf"     
+import {ETH_PRECISION} from "./../contracts/conf"     
+import AppraisalVoteForm from "./AppraisalVoteForm"
+import ShowVotes from "./ShowVotes"
 
 function weiToEthFloat(wei)
 {
@@ -16,7 +18,7 @@ function weiToEthFloat(wei)
     return num;
 }    
 
-const Appraisal = ({data}) => {
+const Appraisal = ({data,type,cont,prov}) => {
     var bHasNFTData=((data.nft_data!==undefined) && data.nft_data.response=="OK");
 
 
@@ -42,7 +44,7 @@ const Appraisal = ({data}) => {
                     <Image
                         h={'210px'}
                         src={
-                            bHasNFTData?data.nft_data.nft.file_url:''
+                            bHasNFTData?data.nft_data.nft.cached_file_url:''
                         }
                         
                         layout={'responsive'}
@@ -244,7 +246,7 @@ const Appraisal = ({data}) => {
                             </Tr>
 
                             {
-                                data.nftMarketplace!==""?
+                                data.nftMarketplace!=="" &&
                                 <Tr>
                                 <Td>
                                 <Text
@@ -266,14 +268,24 @@ const Appraisal = ({data}) => {
                                     <Link href={data.nftMarketplace}>{data.nftMarketplace}</Link>
                                 </Text>
                                 </Td>
-                            </Tr>
-                                :''
+                            </Tr> 
                             }
+
+                            
 
 
                         </Tbody>
                     </Table>
-                    
+                    {
+                                type=='Voter' &&
+                                <AppraisalVoteForm apprID={data.appraisal_id} cont={cont} prov={prov}/>
+                    } 
+                    {
+                        type=='User' /*&& (data.status==1)*/ &&
+                        
+                                <ShowVotes apprID={data.appraisal_id} cont={cont} prov={prov}>sdf</ShowVotes>
+                        
+                    }
                 </Stack>
                 
             </Box>
