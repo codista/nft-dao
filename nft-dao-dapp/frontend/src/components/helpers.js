@@ -1,5 +1,4 @@
-import * as dotenv from "dotenv";
-dotenv.config();
+import {API_URL} from "./../secure_conf.js"
 
 function copyApprData(obj)
 {
@@ -31,7 +30,7 @@ export async function addApprNFTData(apprsFromBC,provid)
     {
         let res;
         try {
-            let url=  process.env.API_URL+"/nft/data/"+apprsFromBC[i].nft_contract+"/"+apprsFromBC[i].nft_id+"/";
+            let url=  API_URL+"/nft/data/"+apprsFromBC[i].nft_contract+"/"+apprsFromBC[i].nft_id+"/";
             console.log("fetching url: "+url);
             res = await fetch(url,{headers: new Headers({
             'Accept': 'application/json', 
