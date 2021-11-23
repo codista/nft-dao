@@ -37,8 +37,9 @@ export async function addApprNFTData(apprsFromBC,provid)
             })});
             if (res.status=="200")
             {
+                console.log("jsut before response");
                 let jsn = await res.json();
-                console.log("client received nft data: "+JSON.stringify(jsn));
+                console.log("client received nft data: "+jsn);
                 returnData[i] = copyApprData(apprsFromBC[i]);
                 returnData[i].nft_data=jsn;
             }  
