@@ -31,7 +31,7 @@ export async function addApprNFTData(apprsFromBC,provid)
     {
         let res;
         try {
-            let url=  process.env.API_URL+"/"+apprsFromBC[i][2]+"/"+apprsFromBC[i][1]+"/";
+            let url=  process.env.API_URL+"/nft/data/"+apprsFromBC.nft_contract+"/"+apprsFromBC.nft_id+"/";
             res = await fetch(url,{headers: new Headers({
             'Accept': 'application/json', 
             })});
