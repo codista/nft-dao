@@ -114,9 +114,9 @@ import { Flex,
                 >
                     {(props) => (
                         <Form>
-                            <Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
+                            <Stack spacing={8} mx={'auto'} maxW={'lg'} py={2} px={6}>
                                 <Stack align={'center'}>
-                                <Text fontSize={'4xl'}>Submit a New NFT Appraisal Request</Text>
+                                <Text fontSize={'2xl'}>Submit a New NFT Appraisal Request</Text>
                                 </Stack>
                                 <Box
                                 rounded={'lg'}
