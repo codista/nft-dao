@@ -97,11 +97,14 @@ import { Flex,
         //bg={useColorModeValue('white', 'gray.700')}
         return (
             
-                <Center
-                
-                align={'center'}
-                justify={'center'}
-                >
+            <Flex
+            
+                p={5}
+                pb={20}
+                w="full"
+                alignItems="center"
+                justifyContent="center"
+            >
                 <Formik
                     initialValues={{ nftContract: "", NFTId: "",NFTMarketplace: "",minVoters: "",minExpertLevel:"",payout:"0.001"}}
                     onSubmit={(values, actions) => {
@@ -113,98 +116,120 @@ import { Flex,
                     }}
                 >
                     {(props) => (
-                        <Form>
+                        <Form >
                             <Stack spacing={8} mx={'auto'} maxW={'lg'} py={2} px={6}>
                                 <Stack align={'center'}>
                                 <Text fontSize={'2xl'}>Submit a New NFT Appraisal Request</Text>
                                 </Stack>
+                            </Stack>   
+                            <Box
+                            rounded={'lg'}
+                            bg={'gray.50'}
+                            boxShadow={'lg'}
+                            p={8}
+                            mx={{ lg: 8 }}
+                            > 
                                 <Box
-                                rounded={'lg'}
-                                bg={'gray.50'}
-                                boxShadow={'lg'}
-                                p={8}>
-                                <Stack spacing={4}>
+                                mx={{ lg: 8 }}
+                                display={{ lg: "flex" }}
+                                maxW={{ lg: "8xl" }}  
+                                >
+                                    <Box w={{ lg: "50%" }} p={10}>
+                                        <Stack spacing={4}>
 
-                                    <Field name="nftContract" validate={validateContract}>
-                                        {({ field, form }) => (
-                                        <FormControl isRequired isInvalid={form.errors.nftContract && form.touched.nftContract}>
-                                            <FormLabel htmlFor="nftContract">NFT Contract Address</FormLabel>
-                                            <Input {...field} id="nftContract" placeholder="nftContract" />
-                                            <FormErrorMessage>{form.errors.nftContract}</FormErrorMessage>
-                                        </FormControl>
-                                        )}
-                                    </Field>
+                                            <Field name="nftContract" validate={validateContract}>
+                                                {({ field, form }) => (
+                                                <FormControl isRequired isInvalid={form.errors.nftContract && form.touched.nftContract}>
+                                                    <FormLabel htmlFor="nftContract">NFT Contract Address</FormLabel>
+                                                    <Input {...field} id="nftContract" placeholder="nftContract" />
+                                                    <FormErrorMessage>{form.errors.nftContract}</FormErrorMessage>
+                                                </FormControl>
+                                                )}
+                                            </Field>
 
-                                    <Field name="NFTId"  validate={validateID}>
-                                        {({ field, form }) => (
-                                        <FormControl isRequired isInvalid={form.errors.NFTId && form.touched.NFTId}>
-                                            <FormLabel htmlFor="NFTId">NFT ID</FormLabel>
-                                            <Input {...field} id="NFTId" placeholder="NFTId" />
-                                            <FormErrorMessage>{form.errors.NFTId}</FormErrorMessage>
-                                        </FormControl>
-                                        )}
-                                    </Field>
+                                            <Field name="NFTId"  validate={validateID}>
+                                                {({ field, form }) => (
+                                                <FormControl isRequired isInvalid={form.errors.NFTId && form.touched.NFTId}>
+                                                    <FormLabel htmlFor="NFTId">NFT ID</FormLabel>
+                                                    <Input {...field} id="NFTId" placeholder="NFTId" />
+                                                    <FormErrorMessage>{form.errors.NFTId}</FormErrorMessage>
+                                                </FormControl>
+                                                )}
+                                            </Field>
 
-                                    <Field name="NFTMarketplace" validate={validateMarketplace}>
-                                        {({ field, form }) => (
-                                        <FormControl isInvalid={form.errors.NFTMarketplace && form.touched.NFTMarketplace}>
-                                            <FormLabel htmlFor="NFTMarketplace">NFT Marketplace Link</FormLabel>
-                                            <Input {...field} id="NFTMarketplace" placeholder="NFTMarketplace" />
-                                            <FormErrorMessage>{form.errors.NFTMarketplace}</FormErrorMessage>
-                                        </FormControl>
-                                        )}
-                                    </Field>
+                                            <Field name="NFTMarketplace" validate={validateMarketplace}>
+                                                {({ field, form }) => (
+                                                <FormControl isInvalid={form.errors.NFTMarketplace && form.touched.NFTMarketplace}>
+                                                    <FormLabel htmlFor="NFTMarketplace">NFT Marketplace Link</FormLabel>
+                                                    <Input {...field} id="NFTMarketplace" placeholder="NFTMarketplace" />
+                                                    <FormErrorMessage>{form.errors.NFTMarketplace}</FormErrorMessage>
+                                                </FormControl>
+                                                )}
+                                            </Field>
+                                        </Stack>
+                                    </Box>
 
-                                    <Field name="minVoters"  validate={validateMinVoters}>
-                                        {({ field, form }) => (
-                                        <FormControl isRequired isInvalid={form.errors.minVoters && form.touched.minVoters}>
-                                            <FormLabel htmlFor="minVoters">Minimum Required Voters</FormLabel>
-                                            <Input {...field} id="minVoters" placeholder="minVoters" />
-                                            <FormErrorMessage>{form.errors.minVoters}</FormErrorMessage>
-                                        </FormControl>
-                                        )}
-                                    </Field>
 
-                                    <Field name="minExpertLevel"  validate={validateExpertLevel}>
-                                        {({ field, form }) => (
-                                        <FormControl isRequired isInvalid={form.errors.minExpertLevel && form.touched.minExpertLevel}>
-                                            <FormLabel htmlFor="minExpertLevel">Minimum Expert Score to Vote</FormLabel>
-                                            <Input {...field} id="minExpertLevel" placeholder="minExpertLevel" />
-                                            <FormErrorMessage>{form.errors.minExpertLevel}</FormErrorMessage>
-                                        </FormControl>
-                                        )}
-                                    </Field>
 
-                                    <Field name="payout"  validate={validatePayout}>
-                                        {({ field, form }) => (
-                                        <FormControl isRequired isInvalid={form.errors.payout && form.touched.payout}>
-                                            <FormLabel htmlFor="payout">Payment in Eth</FormLabel>
-                                            <Input {...field} id="payout" placeholder="payout" />
-                                            <FormErrorMessage>{form.errors.payout}</FormErrorMessage>
-                                        </FormControl>
-                                        )}
-                                    </Field>
+                                    <Box w={{ lg: "50%" }} p={10}>
+                                        <Stack spacing={4}>            
+                                            <Field name="minVoters"  validate={validateMinVoters}>
+                                                {({ field, form }) => (
+                                                <FormControl isRequired isInvalid={form.errors.minVoters && form.touched.minVoters}>
+                                                    <FormLabel htmlFor="minVoters">Minimum Required Voters</FormLabel>
+                                                    <Input {...field} id="minVoters" placeholder="minVoters" />
+                                                    <FormErrorMessage>{form.errors.minVoters}</FormErrorMessage>
+                                                </FormControl>
+                                                )}
+                                            </Field>
+
+                                            <Field name="minExpertLevel"  validate={validateExpertLevel}>
+                                                {({ field, form }) => (
+                                                <FormControl isRequired isInvalid={form.errors.minExpertLevel && form.touched.minExpertLevel}>
+                                                    <FormLabel htmlFor="minExpertLevel">Minimum Expert Score to Vote</FormLabel>
+                                                    <Input {...field} id="minExpertLevel" placeholder="minExpertLevel" />
+                                                    <FormErrorMessage>{form.errors.minExpertLevel}</FormErrorMessage>
+                                                </FormControl>
+                                                )}
+                                            </Field>
+
+                                            <Field name="payout"  validate={validatePayout}>
+                                                {({ field, form }) => (
+                                                <FormControl isRequired isInvalid={form.errors.payout && form.touched.payout}>
+                                                    <FormLabel htmlFor="payout">Payment in Eth</FormLabel>
+                                                    <Input {...field} id="payout" placeholder="payout" />
+                                                    <FormErrorMessage>{form.errors.payout}</FormErrorMessage>
+                                                </FormControl>
+                                                )}
+                                            </Field>
+                                        </Stack>
+                                    </Box>
                                     
-                                    <Stack spacing={10}>
                                     
-                                    <Button type="submit"
-                                        isLoading={props.isSubmitting}
-                                        bg={'blue.400'}
-                                        color={'white'}
-                                        _hover={{
-                                        bg: 'blue.500',
-                                        }}>
-                                        Submit
-                                    </Button>
-                                    </Stack>
-                                </Stack>
-                                </Box>
-                            </Stack>    
+                                </Box>  
+                                <Box w={{ lg: "100%" }}
+                                    alignItems="center"
+                                    justifyContent="center"
+                                >
+                                    
+                                                
+                                                    <Button type="submit"
+                                                        isLoading={props.isSubmitting}
+                                                        bg={'blue.400'}
+                                                        color={'white'}
+                                                        _hover={{
+                                                        bg: 'blue.500',
+                                                        }}>
+                                                        Submit
+                                                    </Button>
+                                    
+                                </Box>  
+                            </Box>
                         </Form>
                     )}
                 
                 </Formik>
-                </Center>
+            </Flex>
             
         )
     }
