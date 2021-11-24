@@ -7,7 +7,7 @@ import { Box,Image,Stack,Text,Center,useColorModeValue,Table,Link,
     Td,
     chakra,
 Flex } from "@chakra-ui/react"
-import {ETH_PRECISION} from "./../contracts/conf"     
+import {ETH_PRECISION} from "./../contracts/NFTConts"     
 import AppraisalVoteForm from "./AppraisalVoteForm"
 import ShowVotes from "./ShowVotes"
 

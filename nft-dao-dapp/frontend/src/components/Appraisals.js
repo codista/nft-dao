@@ -3,7 +3,8 @@ import { Box,Text,Spinner,Button } from "@chakra-ui/react"
 import Appraisal from "./Appraisal"
 import {useState, useEffect} from "react"
 import AddAppraisal from "./AddAppraisal"
-import {ETH_PRECISION} from "./../contracts/conf"
+import {ETH_PRECISION} from "./../contracts/NFTConts"
+
 import {BigNumber} from "ethers"
 import {addApprNFTData} from "./helpers"
 
