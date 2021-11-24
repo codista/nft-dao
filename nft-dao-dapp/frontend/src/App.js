@@ -17,29 +17,70 @@ import { requestUserConnect } from "./bootstrap/initialize"
 import Description from"./components/Description"
 import Appraisals from "./components/Appraisals"
 import AppraisalVotes from "./components/AppraisalVotes"
+import {useEffect,useCallback} from "react"
 
 function App() {
   const [connectedAccount,setConnectedAccount] = useState("");
   const [ethersProvider,setEthersProvider] = useState(null);
   const [ExpNFTCont,SetExpNFTCont] = useState(null);
 
+  
+
+  async function initProvider(prov)
+  {
+    const ethProv = new ethers.providers.Web3Provider(prov, "any");
+    setEthersProvider(ethProv);
+    const expertApprCont = new ethers.Contract(NFTEXP_CONTRACT_ADDRESS, NFTEXP_CONTRACT_ABI, ethProv.getSigner());
+    let address = await ethProv.getSigner().getAddress();
+    SetExpNFTCont(expertApprCont);
+    setConnectedAccount(address);
+  }
+  
+
+  async function hadleConnection(forced) {
+    let provider = await requestUserConnect(forced);
+    if (provider!==null) {
+      initProvider(provider);
+    }
+  }
+  
+  async function handleAccountsChanged(accounts)
+  {
+    let provider = await requestUserConnect(false);
+    if (provider!==null) {
+        const ethProv = new ethers.providers.Web3Provider(provider, "any");
+        setEthersProvider(ethProv);
+        const expertApprCont = new ethers.Contract(NFTEXP_CONTRACT_ADDRESS, NFTEXP_CONTRACT_ABI, ethProv.getSigner());
+        let address = await ethProv.getSigner().getAddress();
+        SetExpNFTCont(expertApprCont);
+        setConnectedAccount(address);
+    }
+  }
+
+  useEffect(() => {
+    async function initcon() {
+      console.log("in init con");
+      let provider = await requestUserConnect(false);
+      if (provider!==null) {
+          const ethProv = new ethers.providers.Web3Provider(provider, "any");
+          setEthersProvider(ethProv);
+          const expertApprCont = new ethers.Contract(NFTEXP_CONTRACT_ADDRESS, NFTEXP_CONTRACT_ABI, ethProv.getSigner());
+          let address = await ethProv.getSigner().getAddress();
+          SetExpNFTCont(expertApprCont);
+          setConnectedAccount(address);
+      }
+    }
+    initcon();
+    window.ethereum.on('accountsChanged', handleAccountsChanged);
+    return () => {
+      window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+    }
+    }  ,[]);
+
+
   async function connectToMetamask()
   {
-    let provider = await requestUserConnect();
-    setEthersProvider(provider);
-    let address = await provider.getSigner().getAddress();
-    const expertApprCont = new ethers.Contract(NFTEXP_CONTRACT_ADDRESS, NFTEXP_CONTRACT_ABI, provider.getSigner());
-   
-    setConnectedAccount(address);
-    
-    SetExpNFTCont(expertApprCont);
-    window.ethereum.on('accountsChanged', function (accounts) {
-      const prov = new ethers.providers.Web3Provider(window.ethereum, "any");
-      setEthersProvider(prov);
-      const expertApprCont = new ethers.Contract(NFTEXP_CONTRACT_ADDRESS, NFTEXP_CONTRACT_ABI, provider.getSigner());
-      SetExpNFTCont(expertApprCont);
-      setConnectedAccount(accounts[0]);
-    })
+    await hadleConnection(true);
   }
 
   
