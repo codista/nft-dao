@@ -91,7 +91,7 @@ function App() {
         <Header connected={connectedAccount} connectFunc={connectToMetamask}/>
         
         <Box bgGradient="linear(to-b, #e3f4fa, white)" minH="1000" width="100%">
-            <Description />
+            
             <Tabs  colorScheme="blue"  padding="20" >
               <TabList>
                 <Tab>Your Appraisal Requests</Tab>

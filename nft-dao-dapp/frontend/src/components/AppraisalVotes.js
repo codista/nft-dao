@@ -19,7 +19,7 @@ async function getVoterApprs(contract,provid)
         
         if (voterStatus!=2) return {status:voterStatus,apprs:apprs,score:scr}
         scr = await contract.getExpertSCore(userAddress);
-        if (scr!==false && scr!==undefined && typeof(scr)==BigNumber)
+        if (scr!==false && scr!==undefined)
         {
             scr=scr.toNumber();
         }
@@ -99,11 +99,19 @@ const AppraisalVotes = ({connected,cont,prov}) => {
                 {fetchingVoteApprs ? <Spinner size="xl" />: 
                     <Box>
                     {connected===""?<Text>Please Connect Metamask to get started</Text>:''}
-                    {connected!=="" && (voteApprs===null || voteApprs.length==0) && voterStatus==2?<Box><Text>Approved Expert! NFT Expert Score: {score} (scale of 1-10000)</Text><br /><Text>Sorry, currently there are no open appraisal requests for your score. Please check back later.</Text></Box>:''}
+                    
                     {(connected!=="" &&  voterStatus==0)?<JoinDaoButton joinDaoFunc={joinDao}  status={voterStatus}/>:''}
+
                     {(connected!=="" &&  voterStatus==1)?<Box><Text>Your NFT Expert Score is being processed. Please chech back later or refresh this page. If this is taking longer than a few minutes try resending with the button below.</Text><JoinDaoButton joinDaoFunc={joinDao}  status={voterStatus}/></Box>:''}
+
+                    {connected!=="" && voterStatus==2?<Box><Text>Approved Expert! NFT Expert Score: {score} (scale of 1-10000)</Text></Box>:''}
+
+                    {connected!=="" && (voteApprs===null || voteApprs.length==0) && voterStatus==2?<Box><Text>Sorry, currently there are no open appraisal requests for your score. Please check back later.</Text></Box>:''}
+
                     {(connected!=="" && voteApprs && voteApprs.length>0 && voterStatus==2)?<Text>Appraisal Requests You Can Vote On</Text>:''}
+                    
                     {(connected!=="" && voteApprs && voteApprs.length>0 && voterStatus==2)?(voteApprs.map((appr) => (<Appraisal data={appr} type="Voter" cont={cont} prov={prov}  id={appr.appraisal_id} key={appr.appraisal_id}/>))):''}
+
                     </Box>
                 }    
         </Box>
