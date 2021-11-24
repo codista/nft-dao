@@ -17,7 +17,7 @@ const Header = ({connected,connectFunc}) => {
             color={["white", "white", "primary.700", "primary.700"]}>
 
             <Box w="400px" color={["black", "black", "primary.500", "primary.500"]}>
-                <Image h={'188px'}
+                <Image h={'70px'}
                         src={
                             'logoNew.png'
                         }
