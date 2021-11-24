@@ -23,13 +23,13 @@ const ShowVotes = ({apprID,cont,prov}) => {
     }
     return (
         <Box>
-            <Button colorScheme="blue" variant="outline" onClick={showVotesFunc}>
+            <Button colorScheme="blue" onClick={showVotesFunc}>
                 {showVotesToggle? 'Hide Votes':'Show Votes'}
             </Button>
             {showVotesToggle && (votes!=null) &&
                 votes.map((vt) => (<Box textAlign ={'left'}  rounded={'lg'} bg={'gray.50'} boxShadow={'lg'} p={8}>
                                         <Box key={vt.voter} ><Text>Voter: </Text><Text>{vt.voter}</Text></Box>
-                                        <Box><Text>Appraisal: </Text><Text>{vt.appraised_value_usd.toNumber()}</Text></Box>
+                                        <Box><Text>Appraisal: </Text><Text>${vt.appraised_value_usd.toNumber()}</Text></Box>
                                     </Box>)) 
             }
         </Box>            

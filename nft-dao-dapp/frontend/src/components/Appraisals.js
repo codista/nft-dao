@@ -76,7 +76,7 @@ const Appraisals = ({connected,cont,prov}) => {
                     <Box>
                     {connected===""?<Text>Please Connect Metamask to get started</Text>:''}
                     {connected!=="" && (userApprs===null || userApprs.length==0)?<Text>You Haven't submitted any appraisal requests yet, please use the form below to add one.</Text>:''}
-                    {(connected!=="" )?<Button m={7} colorScheme="blue" variant="outline" onClick={toggleShowButton}>{showAddAppr?'Hide':'Add a New Appraisal Request'}</Button>:''}
+                    {(connected!=="" )?<Button m={7} colorScheme="blue" onClick={toggleShowButton}>{showAddAppr?'Hide':'Add a New Appraisal Request'}</Button>:''}
                     {(connected!=="" && showAddAppr)?<AddAppraisal AddAppraisalFunc={AddAppraisalF}/>:''}
                     {(connected!=="" && userApprs && userApprs.length>0)?<Text>Your Existing NFT Appraisal Requests</Text>:''}
                     {(connected!=="" && userApprs && userApprs.length>0)?(userApprs.map((appr) => (<Appraisal data={appr} type="User" id={appr.appraisal_id} cont={cont} prov={prov} key={appr.appraisal_id}/>))):''}
