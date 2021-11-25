@@ -1,14 +1,11 @@
 import { Flex,
     Box,
-    Center,
     FormControl,
     FormLabel,
     Input,
-    Checkbox,
+    FormHelperText,
     Stack,
-    Link,
     Button,
-    Heading,
     Text,
     FormErrorMessage,
     useColorModeValue } from "@chakra-ui/react"
@@ -143,6 +140,7 @@ import { Flex,
                                                     <FormLabel htmlFor="nftContract">NFT Contract Address</FormLabel>
                                                     <Input {...field} id="nftContract" placeholder="nftContract" />
                                                     <FormErrorMessage>{form.errors.nftContract}</FormErrorMessage>
+                                                    <FormHelperText>Must be on Ethereum mainnet.</FormHelperText>
                                                 </FormControl>
                                                 )}
                                             </Field>
@@ -153,6 +151,7 @@ import { Flex,
                                                     <FormLabel htmlFor="NFTId">NFT ID</FormLabel>
                                                     <Input {...field} id="NFTId" placeholder="NFTId" />
                                                     <FormErrorMessage>{form.errors.NFTId}</FormErrorMessage>
+                                                    <FormHelperText>The NFT ID in the contract.</FormHelperText>
                                                 </FormControl>
                                                 )}
                                             </Field>
@@ -163,6 +162,7 @@ import { Flex,
                                                     <FormLabel htmlFor="NFTMarketplace">NFT Marketplace Link</FormLabel>
                                                     <Input {...field} id="NFTMarketplace" placeholder="NFTMarketplace" />
                                                     <FormErrorMessage>{form.errors.NFTMarketplace}</FormErrorMessage>
+                                                    <FormHelperText>Optional: Opensea, Foundation etc.</FormHelperText>
                                                 </FormControl>
                                                 )}
                                             </Field>
@@ -179,6 +179,7 @@ import { Flex,
                                                     <FormLabel htmlFor="minVoters">Minimum Required Voters</FormLabel>
                                                     <Input {...field} id="minVoters" placeholder="minVoters" />
                                                     <FormErrorMessage>{form.errors.minVoters}</FormErrorMessage>
+                                                    <FormHelperText>Minimum Appraisers for the Request to fulfill.</FormHelperText>
                                                 </FormControl>
                                                 )}
                                             </Field>
@@ -189,6 +190,7 @@ import { Flex,
                                                     <FormLabel htmlFor="minExpertLevel">Minimum Expert Score to Vote</FormLabel>
                                                     <Input {...field} id="minExpertLevel" placeholder="minExpertLevel" />
                                                     <FormErrorMessage>{form.errors.minExpertLevel}</FormErrorMessage>
+                                                    <FormHelperText>Minimal score for an appraisal to be eligible to vote.</FormHelperText>
                                                 </FormControl>
                                                 )}
                                             </Field>
@@ -199,6 +201,7 @@ import { Flex,
                                                     <FormLabel htmlFor="payout">Payment in Eth</FormLabel>
                                                     <Input {...field} id="payout" placeholder="payout" />
                                                     <FormErrorMessage>{form.errors.payout}</FormErrorMessage>
+                                                    <FormHelperText>Amount to be paid to voters upon fulfillment.</FormHelperText>
                                                 </FormControl>
                                                 )}
                                             </Field>
