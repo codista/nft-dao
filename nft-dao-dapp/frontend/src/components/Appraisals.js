@@ -51,16 +51,17 @@ const Appraisals = ({connected,cont,prov}) => {
     async function AddAppraisalF(appr) {
         //alert("here "+JSON.stringify(appr));
         if (cont===undefined || cont===null) {alert("could not add appraisal request. Pleasse make sure your wallet is connected");return;}
-        
+        let expertLevelDEc = Math.round(Number(appr.minExpertLevel)*1000);
         try {
             let tx = await cont.SubmitNFTForAppraisal(appr.nftContract,
             appr.NFTId,
             appr.NFTMarketplace,
               appr.minVoters,
-              appr.minExpertLevel,{value:floatSTRToBGWei(appr.payout)});
+              expertLevelDEc,{value:floatSTRToBGWei(appr.payout)});
             let receipt = tx.wait(1);
         } catch(error){
             alert("failed to submit appraisal");
+            console.error("failed to submit appraisal "+expertLevelDEc,error.message);
             return;
         }   
         let appraisals = await getAppraisals(cont,prov);

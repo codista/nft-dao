@@ -173,7 +173,7 @@ const Appraisal = ({data,type,cont,prov}) => {
                                 fontWeight={600}
                                 fontSize={'sm'}
                                 letterSpacing={1.1}>
-                                {data.minExpertiseLevel.toString()}
+                                {data.minExpertiseLevel.toNumber()/1000}
                             </Text>
                             </Td>
                         </Tr>

@@ -102,9 +102,9 @@ const AppraisalVotes = ({connected,cont,prov}) => {
                     
                     {(connected!=="" &&  voterStatus==0)?<JoinDaoButton joinDaoFunc={joinDao}  status={voterStatus}/>:''}
 
-                    {(connected!=="" &&  voterStatus==1)?<Box><Text>Your NFT Expert Score is being processed. Please chech back later or refresh this page. If this is taking longer than a few minutes try resending with the button below.</Text><JoinDaoButton joinDaoFunc={joinDao}  status={voterStatus}/></Box>:''}
+                    {(connected!=="" &&  voterStatus==1)?<Box><Text>Your NFT Experience Score is being processed. Please chech back later or refresh this page. If this is taking longer than a few minutes try resending with the button below.</Text><JoinDaoButton joinDaoFunc={joinDao}  status={voterStatus}/></Box>:''}
 
-                    {connected!=="" && voterStatus==2?<Box><Text>Approved Expert! NFT Expert Score: {score} (scale of 1-10000)</Text></Box>:''}
+                    {connected!=="" && voterStatus==2?<Box><Text>Approved Expert! NFT Experience Score: {score/1000.0} (scale of 1-10)</Text></Box>:''}
 
                     {connected!=="" && (voteApprs===null || voteApprs.length==0) && voterStatus==2?<Box><Text>Sorry, currently there are no open appraisal requests for your score. Please check back later.</Text></Box>:''}
 

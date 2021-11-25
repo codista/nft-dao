@@ -67,9 +67,9 @@ import { Flex,
             if (!value) {
             error = "Minimum Expert Score is Required"
             } else { 
-                let x=parseInt(value); 
-                if (isNaN(x) || x<0 || x>10000) {
-                    error = "Must be a number between 1 and 10000"
+                let x=Number(value); 
+                if (isNaN(x) || x<0 || x>10) {
+                    error = "Must be a number (can be a fraction) between 0 and 10"
                 }
             }
             return error
@@ -190,7 +190,7 @@ import { Flex,
                                                     <FormLabel htmlFor="minExpertLevel">Minimum Expert Score to Vote</FormLabel>
                                                     <Input {...field} id="minExpertLevel" placeholder="minExpertLevel" />
                                                     <FormErrorMessage>{form.errors.minExpertLevel}</FormErrorMessage>
-                                                    <FormHelperText>Minimal score for an appraisal to be eligible to vote.</FormHelperText>
+                                                    <FormHelperText>Minimal score for an appraisal to be eligible to vote (a decimal number on a scale of 1-10).</FormHelperText>
                                                 </FormControl>
                                                 )}
                                             </Field>
