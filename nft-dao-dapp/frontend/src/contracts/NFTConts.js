@@ -1,4 +1,11 @@
 export const ETH_PRECISION  = 6;
+export const RINKEBY = "0x4";
+export const MUMBAI = "0x13881";
+export const POLYGON = "0x89";
+export const DAPP_NETWORK=RINKEBY;
+
+export const Networks ={RINKEBY,}
+
 export const ERC1155_ABI = [
     {
       "inputs": [

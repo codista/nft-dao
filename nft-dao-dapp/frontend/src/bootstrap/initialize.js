@@ -1,6 +1,7 @@
 import Web3 from 'web3'
 import detectEthereumProvider from '@metamask/detect-provider';
 import { ethers } from "ethers";
+import * as confs from "./../contracts/NFTConts"
 
 export async function requestUserConnect(bForced)
 {
@@ -51,6 +52,14 @@ export async function requestUserConnect(bForced)
         }
         //const prov = new ethers.providers.Web3Provider(window.ethereum, "any");
         //console.log("acounts is "+accounts);
+        const chainId = await provider.request({ method: 'eth_chainId' });
+        let id = parseInt(chainId,10);
+        
+        if (chainId!==confs.DAPP_NETWORK)
+        {
+            alert("Only Rinkeby testnet is supported. Please change to Rinkeby on Metamask and connect again.");
+            return null;
+        }
         return provider;
     }
     else {
