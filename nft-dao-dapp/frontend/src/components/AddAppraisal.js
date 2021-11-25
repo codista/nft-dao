@@ -140,7 +140,7 @@ import { Flex,
                                                     <FormLabel htmlFor="nftContract">NFT Contract Address</FormLabel>
                                                     <Input {...field} id="nftContract" placeholder="nftContract" />
                                                     <FormErrorMessage>{form.errors.nftContract}</FormErrorMessage>
-                                                    <FormHelperText>Must be on Ethereum mainnet.</FormHelperText>
+                                                    <FormHelperText>Must be on Ethereum mainnet ERC721.</FormHelperText>
                                                 </FormControl>
                                                 )}
                                             </Field>
