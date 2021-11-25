@@ -16,6 +16,7 @@
     "express": "~4.16.1",
     "http-errors": "~1.6.3",
     "jsonpath": "^1.1.1",
+    "lodash": "^4.17.21",
     "morgan": "~1.9.1",
     "node-fetch": "^3.0.0",
     "node-libcurl": "^2.3.3",
