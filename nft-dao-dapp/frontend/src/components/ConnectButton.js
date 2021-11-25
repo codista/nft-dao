@@ -4,7 +4,7 @@ const ConnectButton = ({connected, connectFunc}) => {
     async function  callConnect() {
         await connectFunc();
     }
-
+    
     return (
         connected===""?
         <Button colorScheme="blue" variant="outline" onClick={callConnect}>
