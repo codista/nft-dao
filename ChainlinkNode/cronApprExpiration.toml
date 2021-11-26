@@ -2,8 +2,7 @@ type            = "cron"
 schemaVersion   = 1
 name = "Expirations"
 schedule        = "@every 48h"
-contractAddress = "0xcCe7eB5A3EA0392665960BDAD030F37098e956Ed"
-maxTaskDuration = "0s"
+
 # Optional externalJobID: Automatically generated if unspecified
 
 observationSource   = """
