@@ -13,13 +13,18 @@ async function main() {
   // manually to make sure everything is compiled
   // await hre.run('compile');
 
+  let provider = ethers.provider;
+  const { chainId,name } = await provider.getNetwork()
+  //console.log(chainId+name);
+  const linkTokenAddress = (name=='kovan')?"0xa36085F69e2889c224210F603D836748e7dC0088":"0x01BE23585060835E02B77ef475b0Cc51aA1e0709";
+
   // We get the contract to deploy
   const OracleFactory = await ethers.getContractFactory("Oracle");
-  const oracle = await OracleFactory.deploy("0x01BE23585060835E02B77ef475b0Cc51aA1e0709");
+  const oracle = await OracleFactory.deploy(linkTokenAddress);
 
   await oracle.deployed();
 
-  console.log("oracle deployed to:", oracle.address);
+  console.log(`oracle deployed to: ${oracle.address} on  ${name}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

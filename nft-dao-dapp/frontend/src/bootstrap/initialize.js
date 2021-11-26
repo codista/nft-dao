@@ -57,7 +57,11 @@ export async function requestUserConnect(bForced)
         
         if (chainId!==confs.DAPP_NETWORK)
         {
-            alert("Only Rinkeby testnet is supported. Please change to Rinkeby on Metamask and connect again.");
+            if (confs.DAPP_NETWORK==confs.KOVAN)     
+                alert("Only Kovan testnet is supported. Please change to Rinkeby on Metamask and connect again.");
+            else {
+                alert("Only Rinkeby testnet is supported. Please change to Rinkeby on Metamask and connect again.");
+            }    
             return null;
         }
         return provider;

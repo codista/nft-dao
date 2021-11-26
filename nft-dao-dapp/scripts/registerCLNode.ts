@@ -20,13 +20,16 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract to deploy
-  if (process.env.ORACLE_CONTRACT === undefined || process.env.CHAINLINK_NODE_ADDRESS=== undefined || process.env.PRIVATE_KEY=== undefined)
+  let provider = ethers.provider;
+  const { name } = await provider.getNetwork();
+
+  if (process.env.ORACLE_CONTRACT === undefined || process.env.CHAINLINK_NODE_ADDRESS=== undefined || process.env.PRIVATE_KEY=== undefined || process.env.ORACLE_CONTRACT_KOVAN === undefined || process.env.CHAINLINK_NODE_ADDRESS_KOVAN === undefined )
   {
       console.error('no oracle address or chainlink node or signer address defined');
       return false;
   }
-  let orcAddr = process.env.ORACLE_CONTRACT as string;
-  let chNodeAddr = process.env.CHAINLINK_NODE_ADDRESS as string;
+  let orcAddr = (name=='kovan')?process.env.ORACLE_CONTRACT_KOVAN as string: process.env.ORACLE_CONTRACT as string;
+  let chNodeAddr = (name=='kovan')?process.env.CHAINLINK_NODE_ADDRESS_KOVAN as string:process.env.CHAINLINK_NODE_ADDRESS as string;
   let orcABI;
   try {
     
@@ -37,20 +40,19 @@ async function main() {
       console.error('failed to retrieve oracle.sol contract abi'+error);
       return false;
   }
-  let provider = ethers.provider;
+
   let signer = new ethers.Wallet(process.env.PRIVATE_KEY as string,provider);
   let orac_contract_obj: Oracle = new ethers.Contract(orcAddr,orcABI, signer) as Oracle;
   let gasPrice = await provider.getGasPrice();
   
   console.log(gasPrice.toString());
-  let response: any = await orac_contract_obj.setFulfillmentPermission(chNodeAddr,true,{gasLimit:90000,gasPrice:gasPrice.toNumber()});
-  let receipt: any = await response.wait(1);
+  let tx: any = await orac_contract_obj.setFulfillmentPermission(chNodeAddr,true,{gasLimit:90000,gasPrice:gasPrice.toNumber()});
+  let receipt: any = await tx.wait(1);
 
   let auth: boolean = await orac_contract_obj.getAuthorizationStatus(chNodeAddr);
-  let authWrong: boolean = await orac_contract_obj.getAuthorizationStatus("0x8a90CAb2b38dba80c64b7734e58Ee1dB38B8992e");
   
 
-  console.log(`Chainlink node added to oracle contract: ${auth} and false address is ${authWrong}`);
+  console.log(`Chainlink node added to oracle contract: ${auth} on ${name}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

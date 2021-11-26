@@ -12,7 +12,10 @@ import {
 } from '@chakra-ui/react';
 import Header from "./components/Header"
 import { ethers } from "ethers";
-import { NFTEXP_CONTRACT_ADDRESS, NFTEXP_CONTRACT_ABI} from "./contracts/conf"
+
+import * as cnf from "./contracts/NFTConts"
+import { NFTEXP_CONTRACT_ADDRESS, NFTEXP_CONTRACT_ABI} from "./contracts/conf";
+import { NFTEXP_CONTRACT_ADDRESS_KOVAN, NFTEXP_CONTRACT_ABI_KOVAN} from "./contracts/confKovan";
 import { requestUserConnect } from "./bootstrap/initialize"
 import Description from"./components/Description"
 import Appraisals from "./components/Appraisals"
@@ -24,13 +27,15 @@ function App() {
   const [ethersProvider,setEthersProvider] = useState(null);
   const [ExpNFTCont,SetExpNFTCont] = useState(null);
 
-  
+  let contAddr=(cnf.DAPP_NETWORK==cnf.KOVAN)?NFTEXP_CONTRACT_ADDRESS_KOVAN:NFTEXP_CONTRACT_ADDRESS;
+  let contABI=(cnf.DAPP_NETWORK==cnf.KOVAN)?NFTEXP_CONTRACT_ABI_KOVAN:NFTEXP_CONTRACT_ABI;
+    
 
   async function initProvider(prov)
   {
     const ethProv = new ethers.providers.Web3Provider(prov, "any");
     setEthersProvider(ethProv);
-    const expertApprCont = new ethers.Contract(NFTEXP_CONTRACT_ADDRESS, NFTEXP_CONTRACT_ABI, ethProv.getSigner());
+    const expertApprCont = new ethers.Contract(contAddr, contABI, ethProv.getSigner());
     let address = await ethProv.getSigner().getAddress();
     SetExpNFTCont(expertApprCont);
     setConnectedAccount(address);
@@ -50,7 +55,8 @@ function App() {
     if (provider!==null) {
         const ethProv = new ethers.providers.Web3Provider(provider, "any");
         setEthersProvider(ethProv);
-        const expertApprCont = new ethers.Contract(NFTEXP_CONTRACT_ADDRESS, NFTEXP_CONTRACT_ABI, ethProv.getSigner());
+        
+        const expertApprCont = new ethers.Contract(contAddr, contABI, ethProv.getSigner());
         let address = await ethProv.getSigner().getAddress();
         SetExpNFTCont(expertApprCont);
         setConnectedAccount(address);
@@ -64,7 +70,7 @@ function App() {
       if (provider!==null) {
           const ethProv = new ethers.providers.Web3Provider(provider, "any");
           setEthersProvider(ethProv);
-          const expertApprCont = new ethers.Contract(NFTEXP_CONTRACT_ADDRESS, NFTEXP_CONTRACT_ABI, ethProv.getSigner());
+          const expertApprCont = new ethers.Contract(contAddr, contABI, ethProv.getSigner());
           let address = await ethProv.getSigner().getAddress();
           SetExpNFTCont(expertApprCont);
           setConnectedAccount(address);
@@ -75,6 +81,7 @@ function App() {
     return () => {
       window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
     }
+    // eslint-disable-next-line
     }  ,[]);
 
 

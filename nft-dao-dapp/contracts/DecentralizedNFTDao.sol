@@ -31,6 +31,7 @@ contract DecentralizedNFTDao is ChainlinkClient, ConfirmedOwner {
         uint256                 score;
         ExpertEvaluationStatus  status;
         bool                    initialized;
+        uint256                 last_time_scored;
     }
 
     struct NFTApprisalRequest {
@@ -43,6 +44,7 @@ contract DecentralizedNFTDao is ChainlinkClient, ConfirmedOwner {
         uint256                 minExpertiseLevel;
         uint256                 paymentEth;
         string                  nftMarketplace;
+        address                 creator;
     }
 
     mapping(address => Expert) public experts;
@@ -56,6 +58,7 @@ contract DecentralizedNFTDao is ChainlinkClient, ConfirmedOwner {
     mapping(bytes32 => address) public req_id_to_exp;
     
     NFTApprisalRequest[] appraisals;
+    address[] expertsArr; //for iteration
     
 
     //chainlink connection
@@ -87,7 +90,8 @@ contract DecentralizedNFTDao is ChainlinkClient, ConfirmedOwner {
                                             minVoters,
                                             minExpertiseLevel,
                                             msg.value,
-                                            nftMarketplace));
+                                            nftMarketplace,
+                                            msg.sender));
         user_appraisals[msg.sender].push(appraisals.length - 1);
     }
 
@@ -109,6 +113,7 @@ contract DecentralizedNFTDao is ChainlinkClient, ConfirmedOwner {
         
         experts[req_id_to_exp[_requestId]].score = score;
         experts[req_id_to_exp[_requestId]].status = ExpertEvaluationStatus.Resolved;
+        experts[req_id_to_exp[_requestId]].last_time_scored = block.timestamp;
     }
 
     function getAppraisalStatus(uint256 appraisal_id) public view returns (NFTAppraisalStatus)
@@ -130,6 +135,42 @@ contract DecentralizedNFTDao is ChainlinkClient, ConfirmedOwner {
         }
             
         return filtered;
+    }
+
+    function hasExpiredAppraisals() public view returns (bool)
+    {
+        for (uint256 i=0;i<appraisals.length;i++) {
+            if (((block.timestamp - appraisals[i].request_time) > (60*60*24*30)) &&
+            appraisals[i].status==NFTAppraisalStatus.Open) {
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    function expireAppraisals() public 
+    {
+        //expire appraisal requests after 30 days if not enough votes
+        for (uint256 i=0;i<appraisals.length;i++) {
+            if (((block.timestamp - appraisals[i].request_time) > (60*60*24*30)) &&
+            appraisals[i].status==NFTAppraisalStatus.Open) {
+                    appraisals[i].status==NFTAppraisalStatus.Failed;
+                    //reimburse the appraisal creator with the eth they locked in the contract.
+                    (bool sent, bytes memory data) = appraisals[i].creator.call{value: appraisals[i].paymentEth}("");
+                    require(sent, "Failed to send Ether");
+            }
+        }
+    }
+
+    function updateExpertScores() public 
+    {
+        //update expert score every 60 days
+        for (uint256 i=0;i<expertsArr.length;i++) {
+            if ( (experts[expertsArr[i]].initialized) && ((block.timestamp - experts[expertsArr[i]].last_time_scored) > (60*60*24*60))) {
+                    bytes32 reqId = requestExpertiseScore(msg.sender);
+                    req_id_to_exp[reqId]=msg.sender;
+            }
+        }
     }
 
     //get expert relevant open appraisals
@@ -189,9 +230,16 @@ contract DecentralizedNFTDao is ChainlinkClient, ConfirmedOwner {
         appraisal_voters[appraisal_id][msg.sender]=true;
         appraisal_votes[appraisal_id].push(Vote(msg.sender,USDValue));
 
-        //handle resolution (should be handled externally later when time limit is added)
+        //handle resolution 
         if (appraisal_votes[appraisal_id].length>=appraisals[appraisal_id].minVoters) {
             appraisals[appraisal_id].status=NFTAppraisalStatus.Resolved;
+
+            //distribute payment between voters
+            uint256 perVoter = appraisals[appraisal_id].paymentEth/appraisal_votes[appraisal_id].length;
+            for(uint256 i=0;i<appraisal_votes[appraisal_id].length;i++){
+                (bool sent, bytes memory data) =appraisal_votes[appraisal_id][i].voter.call{value: perVoter}("");
+            }
+                    
         }
         
     }
@@ -201,9 +249,10 @@ contract DecentralizedNFTDao is ChainlinkClient, ConfirmedOwner {
     //join Dao
     function JoinDao() public {
         require(experts[msg.sender].initialized==false || experts[msg.sender].status==ExpertEvaluationStatus.Pending,"Expert is already a member");
-        experts[msg.sender]=Expert(0,ExpertEvaluationStatus.Pending,true);
+        experts[msg.sender]=Expert(0,ExpertEvaluationStatus.Pending,true,0);
         bytes32 reqId = requestExpertiseScore(msg.sender);
         req_id_to_exp[reqId]=msg.sender;
+        expertsArr.push(msg.sender); //fill this array only with scored experts
     }
 
     function getAppraisalVotes(uint256 appraisal_id) public view onlyAppraisalCreator(appraisal_id) returns (Vote[] memory) {
@@ -246,11 +295,9 @@ contract DecentralizedNFTDao is ChainlinkClient, ConfirmedOwner {
         //return "fff";
     }
     
-    //function _calculateNFTAppraisal()
+    
 
-    //pay voters
-
-
+    
 
     function stringToBytes32(string memory source) private pure returns (bytes32 result) {
         bytes memory tempEmptyStringTest = bytes(source);

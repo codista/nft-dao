@@ -9,6 +9,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var nftRouter = require('./routes/nft');
 var nftexpertRouter = require('./routes/nft_expert_score');
+var cronRouter = require('./routes/cronsJobs');
 
 var app = express();
 
@@ -27,6 +28,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/nft',nftRouter);
 app.use('/nftexpert',nftexpertRouter);
+app.use('/crons',cronRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

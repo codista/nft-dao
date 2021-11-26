@@ -13,43 +13,52 @@ async function main() {
   // If this script is run directly using `node` you may want to call compile
   // manually to make sure everything is compiled
   // await hre.run('compile');
+  let provider = ethers.provider;
+  const { name } = await provider.getNetwork();
 
   // We get the contract to deploy
   const NFTDaoFactory = await ethers.getContractFactory("DecentralizedNFTDao");
-  const NFTDao = await NFTDaoFactory.deploy(process.env.ORACLE_CONTRACT as string,process.env.TEST_JOB_ID as string);
+  const oracleAddress = (name=='kovan')?process.env.ORACLE_CONTRACT_KOVAN as string:process.env.ORACLE_CONTRACT as string;
+  const NFTDao = await NFTDaoFactory.deploy(oracleAddress,process.env.TEST_JOB_ID as string);
 
   await NFTDao.deployed();
 
-  console.log("testClient deployed to:", NFTDao.address);
+  console.log(`testClient deployed to: ${NFTDao.address} on ${name}`);
 
   //feed with link
-  let provider = ethers.provider;
   let gasPrice = await provider.getGasPrice();
   let gasPriceWei=gasPrice.toNumber();
+  let initialLinkAmount = 5;
   let signer = new ethers.Wallet(process.env.PRIVATE_KEY as string,provider);
-  let LINKCont = new ethers.Contract(confs.LINK_ADDR_RINKEBY,confs.LINK_ABI, signer);
-  let tx = await LINKCont.transfer(NFTDao.address,(4*((Math.pow(10,18)))).toString(),{gasLimit:350000,gasPrice:gasPriceWei});
+  let linkContAddress=(name=='kovan')?confs.LINK_ADDR_KOVAN:confs.LINK_ADDR_RINKEBY;
+  let LINKCont = new ethers.Contract(linkContAddress,confs.LINK_ABI, signer);
+  let tx = await LINKCont.transfer(NFTDao.address,(initialLinkAmount*((Math.pow(10,18)))).toString(),{gasLimit:350000,gasPrice:gasPriceWei});
   let rec = await tx.wait(1);
+  console.log(`transfered : ${initialLinkAmount} LINK to new contract on ${name}`);
 
-let contArt;
-try {
-  contArt = JSON.parse(fs.readFileSync(path.resolve(__dirname, './../artifacts/contracts/DecentralizedNFTDao.sol/DecentralizedNFTDao.json'), 'utf8'));
-} catch(err) {
-  console.error("failed to parse artifacts");
-  return;
-}
+
+  //write to frontend and api
+  let contArt;
+  try {
+    contArt = JSON.parse(fs.readFileSync(path.resolve(__dirname, './../artifacts/contracts/DecentralizedNFTDao.sol/DecentralizedNFTDao.json'), 'utf8'));
+  } catch(err) {
+    console.error("failed to parse artifacts");
+    return;
+  }
   let contAbi = contArt.abi;
   let contAbiStr= JSON.stringify(contAbi);
 
-  let contractString: string ='export const NFTEXP_CONTRACT_ADDRESS="';
+  let contractString: string =(name=='kovan')?'export const NFTEXP_CONTRACT_ADDRESS_KOVAN="':'export const NFTEXP_CONTRACT_ADDRESS="';
   contractString+=NFTDao.address;
   contractString+='";\n';
-  contractString+='export const NFTEXP_CONTRACT_ABI=';
+  contractString+=(name=='kovan')?'export const NFTEXP_CONTRACT_ABI_KOVAN=':'export const NFTEXP_CONTRACT_ABI=';
   contractString+=contAbiStr;
   contractString+=';\n';
   //console.log(contractString);
+  let confFileName = (name=='kovan')?'confKovan.js':'conf.js';
 
-  var confPath = path.join(__dirname, '..', 'frontend', 'src', 'contracts','conf.js');  
+  //write to frontend
+  var confPath = path.join(__dirname, '..', 'frontend', 'src', 'contracts',confFileName);  
   console.log(`path to write is ${confPath}`);
   try {
     fs.writeFileSync(confPath,contractString);
@@ -57,7 +66,19 @@ try {
     console.error("failed to write to file");
     return;
   }
+  console.log(`successfully wrote contract details to  ${confPath}`);
 
+
+  //write to api
+  var confPathApi = path.join(__dirname, '..', '..','nft-score-api', 'src',confFileName);  
+  console.log(`path to write is ${confPathApi}`);
+  try {
+    fs.writeFileSync(confPathApi,contractString);
+  }catch(err) {
+    console.error("failed to write to file");
+    return;
+  }
+  console.log(`successfully wrote contract details to  ${confPathApi}`);
   
 }
 
